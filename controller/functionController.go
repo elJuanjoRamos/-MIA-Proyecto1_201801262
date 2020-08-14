@@ -5,7 +5,7 @@ import "strings"
 //Re
 func ReplaceAll(str string) string {
 
-	return strings.ReplaceAll(str, "-", " ")
+	return strings.ReplaceAll(str, "*", " ")
 }
 
 //Remueve los espacios
@@ -21,7 +21,7 @@ func RemoveSpaces(command string) string {
 				for j := i + 1; j < len(command); j++ {
 
 					if string(command[j]) == " " {
-						nuevaCadena = nuevaCadena + "-"
+						nuevaCadena = nuevaCadena + "*"
 					} else {
 						nuevaCadena = nuevaCadena + string(command[j])
 					}
@@ -33,7 +33,20 @@ func RemoveSpaces(command string) string {
 				}
 			}
 		}
+
 		return nuevaCadena
 	}
 	return command
+}
+
+func RemoveComilla(command string) string {
+	if strings.ContainsAny(command, "\"") {
+		var str string = strings.ReplaceAll(command, "\"", " ")
+		return strings.Trim(str, " ")
+	}
+	return command
+}
+
+func IfContains(str string, strContains string) bool {
+	return strings.ContainsAny(str, strContains)
 }

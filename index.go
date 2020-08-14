@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"strings"
 
+	//EXECUTE "./commandExecute"
 	INTERPRETE "./commandInterpreter"
 )
 
 func main() {
 	INTERPRETE.Demo()
 	interpret()
+	//EXECUTE.WriteFile()
+	//fmt.Println("Reading File: ")
+	//EXECUTE.ReadFile()
 }
 
 //FUNCION INTERPRETE
@@ -18,18 +22,14 @@ func interpret() {
 	//inicio := "IMPLEMENTACION DE ARCHIVOS.\n ('x' FINALIZAR)"
 	//comando := "exec –path->/home/Desktop/calificacion.mia"
 
-	//comando := "Mkdisk -size->16 -path->\"/home/mis discos duros que guardan info chida/\" -NaMe->Disco4.dsk"
-	comando := "mount -path->/home/Disco1.dsk -name->Part1 #id->vda1"
-	comando2 := "mount -path->/home/Disco2.dsk -name->Part1 #id->vdb1"
-	comando3 := "mount -path->/home/Disco3.dsk -name->Part2 #id->vdc1"
-	comando4 := "mount"
-	comando5 := "mount -path->/home/Disco1.dsk -name->Part2 #id->vda2"
+	comando := "Mkdisk -size->16 -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/\" -NaMe->Prueba.dsk"
+	//comando := "mount -path->/home/Disco1.dsk -name->Part1 #id->vda1"
+	//comando2 := "mount -path->/home/Disco2.dsk -name->Part1 #id->vdb1"
+	//comando3 := "mount -path->/home/Disco3.dsk -name->Part2 #id->vdc1"
+	//comando4 := "mount"
+	//comando5 := "mount -path->/home/Disco1.dsk -name->Part2 #id->vda2"
 
 	INTERPRETE.GetCommand(comando)
-	INTERPRETE.GetCommand(comando2)
-	INTERPRETE.GetCommand(comando3)
-	INTERPRETE.GetCommand(comando4)
-	INTERPRETE.GetCommand(comando5)
 
 	//fmt.Println(inicio)
 
