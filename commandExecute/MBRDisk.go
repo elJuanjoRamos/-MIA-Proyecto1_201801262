@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"unsafe"
+
+	FUNCTIONCONTROLLER "../controller"
 )
 
 type MBR struct {
@@ -32,7 +34,7 @@ func ReadFile() {
 	//Lee la cantidad de <size> bytes del archivo
 	data := leerBytes(file, size)
 	//Convierte la data en un buffer,necesario para
-	//decodificar binario
+	//decodificar binaryTemp
 	buffer := bytes.NewBuffer(data)
 
 	//Decodificamos y guardamos en la variable m
@@ -58,30 +60,34 @@ func leerBytes(file *os.File, number int) []byte {
 	return bytes
 }
 
-//Método para escribir en un archivo, en este caso se escribe un archivo binario de 1kb, 1024 bytes.
-func WriteFile(name string, size int64) {
-	file, err := os.Create(name)
+//Método para escribir en un archivo, en este caso se escribe un archivo binaryTemp de 1kb, 1024 bytes.
+func WriteFile(name string, path string, size int64) {
+
+	//Mando a crear el directorio
+	FUNCTIONCONTROLLER.CreateADirectory(path)
+
+	file, err := os.Create(path + name)
 	defer file.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var otro int8 = 0
+	var other int8 = 0
 
-	s := &otro
+	s := &other
 
-	fmt.Println(unsafe.Sizeof(otro))
+	fmt.Println(unsafe.Sizeof(other))
 	//Escribimos un 0 en el inicio del archivo.
-	var binario bytes.Buffer
-	binary.Write(&binario, binary.BigEndian, s)
-	escribirBytes(file, binario.Bytes())
+	var binaryTemp bytes.Buffer
+	binary.Write(&binaryTemp, binary.BigEndian, s)
+	escribirBytes(file, binaryTemp.Bytes())
 	//Nos posicionamos en el byte 1023 (primera posicion es 0)
 	file.Seek(size, 0) // segundo parametro: 0, 1, 2.     0 -> Inicio, 1-> desde donde esta el puntero, 2 -> Del fin para atras
 
 	//Escribimos un 0 al final del archivo.
-	var binario2 bytes.Buffer
-	binary.Write(&binario2, binary.BigEndian, s)
-	escribirBytes(file, binario2.Bytes())
+	var binaryTemp2 bytes.Buffer
+	binary.Write(&binaryTemp2, binary.BigEndian, s)
+	escribirBytes(file, binaryTemp2.Bytes())
 
 	//----------------------------------------------------------------------- //
 	//Escribimos nuestro struct en el inicio del archivo
@@ -99,9 +105,9 @@ func WriteFile(name string, size int64) {
 	s1 := &disco
 
 	//Escribimos struct.
-	var binario3 bytes.Buffer
-	binary.Write(&binario3, binary.BigEndian, s1)
-	escribirBytes(file, binario3.Bytes())
+	var binaryTemp3 bytes.Buffer
+	binary.Write(&binaryTemp3, binary.BigEndian, s1)
+	escribirBytes(file, binaryTemp3.Bytes())
 
 }
 

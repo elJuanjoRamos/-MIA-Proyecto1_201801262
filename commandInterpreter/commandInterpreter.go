@@ -60,8 +60,7 @@ func ExecCommand(arCommand string) {
 
 //-============MKDIR COMMAND
 func MKDiskCommand(arCommand []string) {
-	var comando string
-	var size int
+	var size int64
 	var path string
 	var name string
 	var unit int64 = 0
@@ -75,13 +74,13 @@ func MKDiskCommand(arCommand []string) {
 		switch aux {
 		case "-size":
 			//trata de covertir el size a numero
-			size, err := strconv.Atoi(commandToExecute[1])
+			temp, err := strconv.Atoi(commandToExecute[1])
 			if err == nil {
-				if size <= 0 {
+				if temp <= 0 {
 					fmt.Println("Error, El size no puede ser menor o igual a 0")
 					error = true
 				} else {
-					fmt.Println(size)
+					size = int64(temp)
 				}
 			} else {
 				fmt.Println("Error, el size establecido no se puede convertir a numero")
@@ -118,14 +117,10 @@ func MKDiskCommand(arCommand []string) {
 		if unit == 0 {
 			unit = 1024 * 1024
 		}
-		EXECUTE.WriteFile(path+name, unit)
+		EXECUTE.WriteFile(name, path, unit*size)
 	}
 
-	fmt.Println("Comando: " + comando)
 	fmt.Println("Size: ", size)
-	fmt.Println("Path: " + path)
-	fmt.Println("Name: " + name)
-	fmt.Println("Unit: ", unit)
 
 }
 

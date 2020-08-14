@@ -22,14 +22,15 @@ func interpret() {
 	//inicio := "IMPLEMENTACION DE ARCHIVOS.\n ('x' FINALIZAR)"
 	//comando := "exec –path->/home/Desktop/calificacion.mia"
 
-	comando := "Mkdisk -size->16 -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/\" -NaMe->Prueba.dsk"
+	comando1 := "Mkdisk -size->16 -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/\" -name->Disco16.dsk "
 	//comando := "mount -path->/home/Disco1.dsk -name->Part1 #id->vda1"
+	//comando := "mount -path->/home/Disco1.dsk -name->Part1 #id->vd0a1"
 	//comando2 := "mount -path->/home/Disco2.dsk -name->Part1 #id->vdb1"
 	//comando3 := "mount -path->/home/Disco3.dsk -name->Part2 #id->vdc1"
 	//comando4 := "mount"
 	//comando5 := "mount -path->/home/Disco1.dsk -name->Part2 #id->vda2"
 
-	INTERPRETE.GetCommand(comando)
+	INTERPRETE.GetCommand(comando1)
 
 	//fmt.Println(inicio)
 
