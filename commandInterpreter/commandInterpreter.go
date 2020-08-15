@@ -130,7 +130,7 @@ func RMDiskCommand(arCommand string) {
 
 	var commandToExecute []string = strings.Split(arCommand, "->")
 	var path string = FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])
-	fmt.Println(path)
+	EXECUTE.RemoveDisk(path)
 }
 
 //=======FDISK COMMAND
