@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	//EXECUTE "./commandExecute"
+	//EXECCOMAND "./commandExecute"
 	INTERPRETE "./commandInterpreter"
 )
 
 func main() {
-	INTERPRETE.Demo()
 	interpret()
 	//EXECUTE.WriteFile()
 	//fmt.Println("Reading File: ")
@@ -22,16 +22,28 @@ func interpret() {
 	//inicio := "IMPLEMENTACION DE ARCHIVOS.\n ('x' FINALIZAR)"
 	//comando := "exec –path->/home/Desktop/calificacion.mia"
 
-	comando1 := "Mkdisk -size->2 -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/\" -name->Disco16.dsk "
-	comando := "rmDisk -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco16.dsk\""
+	comando1 := "exec -path->/home/eljuanjoramos/Escritorio/archivo"
+	//comando1 := "Mkdisk -size->32 -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/\" -name->Disco1.dsk -uniT->k"
+	//var arCommand []string = strings.Split(comando1, " ")
+
+	//var command = strings.ToLower(arCommand[0])
+
+	//comando := "rmDisk -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco16.dsk\""
 	//comando := "mount -path->/home/Disco1.dsk -name->Part1 #id->vd0a1"
 	//comando2 := "mount -path->/home/Disco2.dsk -name->Part1 #id->vdb1"
 	//comando3 := "mount -path->/home/Disco3.dsk -name->Part2 #id->vdc1"
 	//comando4 := "mount"
 	//comando5 := "mount -path->/home/Disco1.dsk -name->Part2 #id->vda2"
 
+	/*if command == "exec" {
+		EXECCOMAND.ReadEntryFile(arCommand[1])
+	} else {
+		INTERPRETE.GetCommand(comando1)
+	}*/
+
 	INTERPRETE.GetCommand(comando1)
-	INTERPRETE.GetCommand(comando)
+
+	//INTERPRETE.GetCommand(comando)
 	//fmt.Println(inicio)
 
 	/*for finalizar != 1 {

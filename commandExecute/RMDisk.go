@@ -29,7 +29,6 @@ func RemoveDisk(path string) {
 		} else {
 			input = strings.TrimRight(comando, "\n")
 		}
-
 		if strings.TrimRight(input, "\n") == "Y" || strings.TrimRight(input, "\n") == "y" {
 			//Borra el disco
 			err := os.Remove(str)
