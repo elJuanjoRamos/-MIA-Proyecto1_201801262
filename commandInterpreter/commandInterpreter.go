@@ -46,9 +46,23 @@ func GetCommand(commandEntry string) {
 		fmt.Println("--" + commandEntry)
 		fmt.Println("six")
 		break
+	case "readdisk":
+		fmt.Println("--" + commandEntry)
+		ReadDiskCommand(arCommand[1])
+		break
+
 	default:
 
 	}
+}
+
+//========================READ COMAND
+func ReadDiskCommand(arCommand string) {
+
+	var commandToExecute []string = strings.Split(arCommand, "->")
+	var path string = FUNCTIONCONTROLLER.ReplaceAll(FUNCTIONCONTROLLER.RemoveComilla(FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])))
+	EXECUTE.ReadFile(path)
+
 }
 
 //=========================EXEC COMMAND
@@ -163,7 +177,6 @@ func MKDiskCommand(arCommand []string) {
 			unit = 1024 * 1024
 		}
 		EXECUTE.WriteFile(name, path, unit*size)
-		//EXECUTE.ReadFile("/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk")
 	}
 
 }
@@ -179,15 +192,15 @@ func RMDiskCommand(arCommand string) {
 
 //=======FDISK COMMAND
 func FDiskCommand(arCommand []string) {
-	var comando string
+	//var comando string
 	var size int64 = 0
 	var unit int64 = 0
 	var path string
 	var name string
 	var types byte = 0
 	var fit byte = 0
-	var deletes string
-	var adds string
+	//var deletes string
+	//var adds string
 	var error bool = false
 
 	for i := 1; i < len(arCommand); i++ {
@@ -228,9 +241,9 @@ func FDiskCommand(arCommand []string) {
 		case "-fit":
 			fit = commandToExecute[1][0]
 		case "-delete":
-			deletes = commandToExecute[1]
+			//deletes = commandToExecute[1]
 		case "-add":
-			adds = commandToExecute[1]
+			//adds = commandToExecute[1]
 		}
 
 	}
@@ -246,15 +259,16 @@ func FDiskCommand(arCommand []string) {
 			types = 'P'
 		}
 		EXECUTE.FormatDisk(path, unit*size, name, types, fit)
+
 	}
-	fmt.Println("------------------ ")
+	/*fmt.Println("------------------ ")
 	fmt.Println("Comando: " + comando)
 	fmt.Println("Size: ", size)
 	fmt.Println("Path: " + path)
 	fmt.Println("Name: " + name)
 	fmt.Println("Unit: ", unit)
 	fmt.Println("Delete: " + deletes)
-	fmt.Println("Add: " + adds)
+	fmt.Println("Add: " + adds)*/
 
 }
 

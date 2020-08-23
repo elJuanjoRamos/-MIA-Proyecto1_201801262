@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
-	"strconv"
 	"unsafe"
 
 	STRUCTURES "../structures"
@@ -16,13 +14,11 @@ import (
 func FormatDisk(path string, partitionSize int64, partitionName string, partitionType byte, partitionFit byte) {
 
 	//BUSCAMOS EL ARCHIVO
-	file, err := os.Open(path)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
 	defer file.Close()
-	if err != nil { //validar que no sea nulo.
-		log.Fatal(err)
-
+	if err != nil {
+		fmt.Println(err)
 	} else {
-
 		//Declaramos variable de tipo mbr
 		m := STRUCTURES.MBR{}
 		//Obtenemos el tamanio del mbr
@@ -42,52 +38,67 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 
 		//Se revisan la cantidad de particiones disponibles en
 		//el disco
-		switch m.Mbr_count {
-		case 4: //Se mete en la particion 1
-			m.Mbr_partition_1 = STRUCTURES.PARTITION{
-				Part_status: 'V',
-				Part_type:   partitionType,
-				Part_fit:    partitionFit,
-				Part_start:  1,
-				Part_size:   partitionSize}
-			copy(m.Mbr_partition_1.Part_name[:], partitionName)
+		if m.Mbr_count > 0 {
 
-			//Se disminuye el contador de particiones
-			m.Mbr_count = 3
-			break
+			switch m.Mbr_count {
+			case 4: //Se mete en la particion 1
+				m.Mbr_partition_1 = STRUCTURES.PARTITION{
+					Part_status: 'V',
+					Part_type:   partitionType,
+					Part_fit:    partitionFit,
+					Part_start:  1,
+					Part_size:   partitionSize}
+				copy(m.Mbr_partition_1.Part_name[:], partitionName)
+				//Se disminuye el contador de particiones
+				m.Mbr_count = 3
+				break
+			case 3:
+				m.Mbr_partition_2 = STRUCTURES.PARTITION{
+					Part_status: 'V',
+					Part_type:   partitionType,
+					Part_fit:    partitionFit,
+					Part_start:  1,
+					Part_size:   partitionSize}
+				copy(m.Mbr_partition_2.Part_name[:], partitionName)
+				//Se disminuye el contador de particiones
+				m.Mbr_count = 2
+				break
+			case 2:
+				m.Mbr_partition_3 = STRUCTURES.PARTITION{
+					Part_status: 'V',
+					Part_type:   partitionType,
+					Part_fit:    partitionFit,
+					Part_start:  1,
+					Part_size:   partitionSize}
+				copy(m.Mbr_partition_3.Part_name[:], partitionName)
+				//Se disminuye el contador de particiones
+				m.Mbr_count = 1
+				break
+			case 1:
+				m.Mbr_partition_4 = STRUCTURES.PARTITION{
+					Part_status: 'V',
+					Part_type:   partitionType,
+					Part_fit:    partitionFit,
+					Part_start:  1,
+					Part_size:   partitionSize}
+				copy(m.Mbr_partition_4.Part_name[:], partitionName)
+				//Se disminuye el contador de particiones
+				m.Mbr_count = 0
+				break
+			}
+
+			//Se situa en la posicion 0,0 del archivo
+			file.Seek(0, 0)
+			//Escribe el mbr con particiones en el archivo
+			s1 := &m
+			var binario3 bytes.Buffer
+			binary.Write(&binario3, binary.BigEndian, s1)
+			escribirBytes(file, binario3.Bytes())
+
+		} else {
+			fmt.Println("No se puede escribir mas particiones en el disco")
 		}
-
-		//Se imprimen los valores guardados en el struct
-		fmt.Println("-----MBR DATA-----")
-		fmt.Printf("SIZE: %s\nFECHA: %s\nSIGNATURE: %s\n", strconv.Itoa(int(m.Mbr_size)), m.Mbr_creation_date, strconv.Itoa(int(m.Mbr_disk_signature)))
-		fmt.Println("----------")
-		fmt.Println("-----PARTITION-----")
-
-		s := reflect.ValueOf(&m.Mbr_partition_1).Elem()
-		typeOfT := s.Type()
-
-		for i := 0; i < s.NumField(); i++ {
-			f := s.Field(i)
-			fmt.Printf("%s = %v\n",
-				typeOfT.Field(i).Name, f.Interface())
-		}
-		//Nos situamos en el inicio del archivo
-		//file.Seek(0, 0)
-
-		s1 := &m
-		var binario3 bytes.Buffer
-		binary.Write(&binario3, binary.BigEndian, s1)
-		escribirBytes2(file, binario3.Bytes())
 
 	}
 
-}
-
-//Método para escribir en un archivo.
-func escribirBytes2(file *os.File, bytes []byte) {
-	_, err := file.Write(bytes)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 }

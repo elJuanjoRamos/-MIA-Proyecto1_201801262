@@ -3,12 +3,9 @@ package commandExecute
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
-	"reflect"
-	"strconv"
 	"time"
 	"unsafe"
 
@@ -16,66 +13,12 @@ import (
 	STRUCTURES "../structures"
 )
 
-//	FUNCION PARA LEER ARCHIVOS
-func ReadFile(path string) {
-
-	//Abrimos/creamos un archivo.
-	file, err := os.Open(path)
-	defer file.Close()
-	if err != nil { //validar que no sea nulo.
-		log.Fatal(err)
-	}
-
-	//Declaramos variable de tipo mbr
-	m := STRUCTURES.MBR{}
-	//Obtenemos el tamanio del mbr
-	var size int = int(unsafe.Sizeof(m))
-
-	//Lee la cantidad de <size> bytes del archivo
-	data := leerBytes(file, size)
-	//Convierte la data en un buffer,necesario para
-	//decodificar binario
-	buffer := bytes.NewBuffer(data)
-
-	//Decodificamos y guardamos en la variable m
-	err = binary.Read(buffer, binary.BigEndian, &m)
-	if err != nil {
-		log.Fatal("binary.Read failed", err)
-	}
-
-	//Se imprimen los valores guardados en el struct
-	fmt.Println(m)
-	fmt.Printf("SIZE: %s\nFECHA: %s\nSIGNATURE: %s\n", strconv.Itoa(int(m.Mbr_size)), m.Mbr_creation_date, strconv.Itoa(int(m.Mbr_disk_signature)))
-	fmt.Println("Partition:")
-
-	s := reflect.ValueOf(&m.Mbr_partition_1).Elem()
-	typeOfT := s.Type()
-
-	for i := 0; i < s.NumField(); i++ {
-		f := s.Field(i)
-		fmt.Printf("%s = %v\n",
-			typeOfT.Field(i).Name, f.Interface())
-	}
-}
-
-//Función que lee del archivo, se especifica cuantos bytes se quieren leer.
-func leerBytes(file *os.File, number int) []byte {
-	bytes := make([]byte, number) //array de bytes
-
-	_, err := file.Read(bytes) // Leido -> bytes
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return bytes
-}
-
 //Método para escribir en un archivo
 func WriteFile(name string, path string, size int64) {
 
 	//Mando a crear el directorio
 	FUNCTIONCONTROLLER.CreateADirectory(path)
-
+	//Se crea el archivo
 	file, err := os.Create(path + name)
 	defer file.Close()
 	if err != nil {
@@ -112,13 +55,6 @@ func WriteFile(name string, path string, size int64) {
 	copy(disco.Mbr_creation_date[:], time.Format("2006-01-02 15:04:05"))
 	var sizeDisk int64 = int64(unsafe.Sizeof(disco))
 	disco.Mbr_size = sizeDisk
-
-	/*disco.Mbr_partition_1 = STRUCTURES.PARTITION{
-	Part_status: 'F',
-	Part_type:   'F',
-	Part_fit:    'F',
-	Part_start:  30,
-	Part_size:   1024}*/
 
 	//Escribimos struct.
 	s1 := &disco

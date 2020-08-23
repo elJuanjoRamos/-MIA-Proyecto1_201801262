@@ -11,9 +11,9 @@ type MBR struct {
 	Mbr_disk_signature int64
 	Mbr_count          int8
 	Mbr_partition_1    PARTITION
-	/*Mbr_partition_2    PARTITION
+	Mbr_partition_2    PARTITION
 	Mbr_partition_3    PARTITION
-	Mbr_partition_4    PARTITION*/
+	Mbr_partition_4    PARTITION
 }
 
 /*type MBAR struct {
