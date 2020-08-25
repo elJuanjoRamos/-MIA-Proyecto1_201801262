@@ -1,0 +1,1 @@
+digraph test { graph [ratio=fill];node [label="Grafica", fontsize=15, shape=plaintext];graph [bb="0,0,352,154"];arset [label=<<TABLE><TR><TD>Mbr_size</TD><TD>240</TD></TR><TR><TD>Mbr_creation_date</TD><TD>2020-08-24 18:58:13</TD></TR><TR><TD>Mbr_disk_signature</TD><TD>5577006791947779410</TD></TR></TABLE>>, ];}

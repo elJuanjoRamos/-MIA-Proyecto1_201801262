@@ -7,7 +7,7 @@ package structures
 
 type MBR struct {
 	Mbr_size           int64
-	Mbr_creation_date  [30]byte
+	Mbr_creation_date  [19]byte
 	Mbr_disk_signature int64
 	Mbr_count          int8
 	Mbr_partition_1    PARTITION
@@ -30,6 +30,7 @@ type PARTITION struct {
 	Part_start  int64
 	Part_size   int64
 	Part_name   [16]byte
+	Part_active bool
 }
 
 //ESTRUCTURA DEL Extended Boot Record

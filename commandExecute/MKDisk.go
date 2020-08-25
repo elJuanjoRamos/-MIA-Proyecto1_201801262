@@ -10,6 +10,7 @@ import (
 	"unsafe"
 
 	FUNCTIONCONTROLLER "../controller"
+	REPORTS "../reports"
 	STRUCTURES "../structures"
 )
 
@@ -61,7 +62,7 @@ func WriteFile(name string, path string, size int64) {
 	var binario3 bytes.Buffer
 	binary.Write(&binario3, binary.BigEndian, s1)
 	escribirBytes(file, binario3.Bytes())
-
+	REPORTS.CreateMBRReport(disco)
 }
 
 //Método para escribir en un archivo.

@@ -3,6 +3,9 @@ package controller
 import (
 	"fmt"
 	"os"
+	"path"
+	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -73,4 +76,11 @@ func CreateADirectory(path string) {
 			fmt.Println("El directorio fue creado correctamente")
 		}
 	}
+}
+
+//Retorna la ruta del proyecto
+func RootDir() string {
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b))
+	return filepath.Dir(d)
 }

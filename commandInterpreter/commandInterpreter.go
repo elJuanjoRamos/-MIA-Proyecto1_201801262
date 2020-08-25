@@ -177,6 +177,7 @@ func MKDiskCommand(arCommand []string) {
 			unit = 1024 * 1024
 		}
 		EXECUTE.WriteFile(name, path, unit*size)
+		//EXECUTE.CreateReport()
 	}
 
 }

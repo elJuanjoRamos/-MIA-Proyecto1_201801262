@@ -8,6 +8,7 @@ import (
 	"os"
 	"unsafe"
 
+	REPORTS "../reports"
 	STRUCTURES "../structures"
 )
 
@@ -47,7 +48,8 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 					Part_type:   partitionType,
 					Part_fit:    partitionFit,
 					Part_start:  1,
-					Part_size:   partitionSize}
+					Part_size:   partitionSize,
+					Part_active: true}
 				copy(m.Mbr_partition_1.Part_name[:], partitionName)
 				//Se disminuye el contador de particiones
 				m.Mbr_count = 3
@@ -58,7 +60,8 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 					Part_type:   partitionType,
 					Part_fit:    partitionFit,
 					Part_start:  1,
-					Part_size:   partitionSize}
+					Part_size:   partitionSize,
+					Part_active: true}
 				copy(m.Mbr_partition_2.Part_name[:], partitionName)
 				//Se disminuye el contador de particiones
 				m.Mbr_count = 2
@@ -69,7 +72,8 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 					Part_type:   partitionType,
 					Part_fit:    partitionFit,
 					Part_start:  1,
-					Part_size:   partitionSize}
+					Part_size:   partitionSize,
+					Part_active: true}
 				copy(m.Mbr_partition_3.Part_name[:], partitionName)
 				//Se disminuye el contador de particiones
 				m.Mbr_count = 1
@@ -80,7 +84,8 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 					Part_type:   partitionType,
 					Part_fit:    partitionFit,
 					Part_start:  1,
-					Part_size:   partitionSize}
+					Part_size:   partitionSize,
+					Part_active: true}
 				copy(m.Mbr_partition_4.Part_name[:], partitionName)
 				//Se disminuye el contador de particiones
 				m.Mbr_count = 0
@@ -94,7 +99,7 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 			var binario3 bytes.Buffer
 			binary.Write(&binario3, binary.BigEndian, s1)
 			escribirBytes(file, binario3.Bytes())
-
+			REPORTS.CreateMBRReport(m)
 		} else {
 			fmt.Println("No se puede escribir mas particiones en el disco")
 		}
