@@ -1,4 +1,4 @@
-package lib
+package interpreter
 
 import (
 	"bufio"
@@ -8,14 +8,14 @@ import (
 	"strconv"
 	"strings"
 
-	EXECUTE "../commandExecute"
-	FUNCTIONCONTROLLER "../controller"
+	EXECUTE "../commands"
+	FUNCTION "../functions"
 )
 
 // This func must be Exported, Capitalized, and comment added.
 
 func GetCommand(commandEntry string) {
-	var arCommand []string = strings.Split(FUNCTIONCONTROLLER.RemoveSpaces(commandEntry), " ")
+	var arCommand []string = strings.Split(FUNCTION.RemoveSpaces(commandEntry), " ")
 
 	var command = strings.ToLower(arCommand[0])
 
@@ -60,7 +60,7 @@ func GetCommand(commandEntry string) {
 func ReadDiskCommand(arCommand string) {
 
 	var commandToExecute []string = strings.Split(arCommand, "->")
-	var path string = FUNCTIONCONTROLLER.ReplaceAll(FUNCTIONCONTROLLER.RemoveComilla(FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])))
+	var path string = FUNCTION.ReplaceAll(FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1])))
 	EXECUTE.ReadFile(path)
 
 }
@@ -74,7 +74,7 @@ func ExecCommand(arCommand string) {
 
 	var fpath string = commandToExecute[1]
 
-	readFile, err := os.Open(fpath)
+	readFile, err := os.Open(FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(fpath)))
 
 	if err != nil {
 		log.Fatalf("failed to open file: %s", err)
@@ -147,7 +147,7 @@ func MKDiskCommand(arCommand []string) {
 				error = true
 			}
 		case "-path":
-			path = FUNCTIONCONTROLLER.RemoveComilla(FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1]))
+			path = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 		case "-unit":
 
 			if strings.ToLower(commandToExecute[1]) == "k" {
@@ -162,7 +162,7 @@ func MKDiskCommand(arCommand []string) {
 
 			var nameArray []string = strings.Split(commandToExecute[1], ".")
 			if nameArray[1] == "dsk" {
-				name = FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])
+				name = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			} else {
 				fmt.Println("No contiene la extension correcta")
 				error = true
@@ -187,7 +187,7 @@ func MKDiskCommand(arCommand []string) {
 func RMDiskCommand(arCommand string) {
 
 	var commandToExecute []string = strings.Split(arCommand, "->")
-	var path string = FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])
+	var path string = FUNCTION.ReplaceAll(commandToExecute[1])
 	EXECUTE.RemoveDisk(path)
 }
 
@@ -223,7 +223,7 @@ func FDiskCommand(arCommand []string) {
 				error = true
 			}
 		case "-path":
-			path = FUNCTIONCONTROLLER.RemoveComilla(FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1]))
+			path = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 		case "-unit":
 			if strings.ToLower(commandToExecute[1]) == "k" {
 				unit = 1024
@@ -236,7 +236,7 @@ func FDiskCommand(arCommand []string) {
 				error = true
 			}
 		case "-name":
-			name = FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])
+			name = FUNCTION.ReplaceAll(commandToExecute[1])
 		case "-type":
 			types = commandToExecute[1][0]
 		case "-fit":
@@ -275,10 +275,9 @@ func FDiskCommand(arCommand []string) {
 
 //=======MOUNT COMMAND
 func MOUNTCommand(arCommand []string) {
-	var comando string = arCommand[0]
-	var path string
-	var name string
-	var id string
+
+	var path string = "null"
+	var name string = "null"
 
 	if len(arCommand) > 1 {
 		for i := 1; i < len(arCommand); i++ {
@@ -287,20 +286,17 @@ func MOUNTCommand(arCommand []string) {
 			var aux string = strings.ToLower(commandToExecute[0])
 			switch aux {
 			case "-path":
-				path = FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])
+				path = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			case "-name":
-				name = FUNCTIONCONTROLLER.ReplaceAll(commandToExecute[1])
-			case "#id":
-				id = commandToExecute[1]
+				name = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			}
 
 		}
 	}
 
-	fmt.Println("------------------ ")
-	fmt.Println("Comando: " + comando)
-	fmt.Println("Path: " + path)
-	fmt.Println("Name: " + name)
-	fmt.Println("ID: " + id)
-
+	if path != "null" && name != "null" {
+		EXECUTE.Mount(path, name)
+	} else {
+		EXECUTE.MountPrint()
+	}
 }

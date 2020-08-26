@@ -16,12 +16,6 @@ type MBR struct {
 	Mbr_partition_4    PARTITION
 }
 
-/*type MBAR struct {
-	Mbr_size           int64
-	Mbr_disk_signature int64
-	Mbr_creation_date  [20]byte
-}*/
-
 //ESTRUCTURA DE UNA PARTICION
 type PARTITION struct {
 	Part_status byte
@@ -41,4 +35,10 @@ type EBR struct {
 	Part_size   int64
 	Part_next   int64
 	Part_name   [16]byte
+}
+type MOUNT struct {
+	Mount_id        string
+	Mount_path      string
+	Mount_particion string
+	Mount_estado    bool
 }

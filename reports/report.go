@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strconv"
 
-	CONTROLLER "../controller"
+	CONTROLLER "../functions"
 	STRUCTURES "../structures"
 )
 

@@ -1,4 +1,4 @@
-package controller
+package functions
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-//Re
+//Reemplaza los * de las path por espacios
 func ReplaceAll(str string) string {
 
 	return strings.ReplaceAll(str, "*", " ")
@@ -32,7 +32,6 @@ func RemoveSpaces(command string) string {
 					} else {
 						nuevaCadena = nuevaCadena + string(command[j])
 					}
-
 					if string(command[j]) == "\"" {
 						i = j
 						break
@@ -40,7 +39,6 @@ func RemoveSpaces(command string) string {
 				}
 			}
 		}
-
 		return nuevaCadena
 	}
 	return command
@@ -62,12 +60,22 @@ func IfContains(str string, strContains string) bool {
 
 //================FUNCIONES ESPECIALES
 
+//Verifica si existe un archivo o ruta
+
+func IfExistDirectoryOrPath(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		fmt.Println("La path no existe")
+		return false
+	} else {
+		return true
+	}
+}
+
 //Crea un directorio si no existe
 func CreateADirectory(path string) {
 
 	//Revisa si existe o no el directorio
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		fmt.Println("La path no existe")
+	if !IfExistDirectoryOrPath(path) {
 		//Create a folder/directory at a full qualified path
 		err := os.Mkdir(path, 0755)
 		if err != nil {

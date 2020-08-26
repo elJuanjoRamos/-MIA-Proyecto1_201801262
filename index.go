@@ -6,7 +6,7 @@ import (
 
 	//EXECUTE "./commandExecute"
 	//EXECCOMAND "./commandExecute"
-	INTERPRETE "./commandInterpreter"
+	INTERPRETE "./interpreter"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func interpret() {
 	//inicio := "IMPLEMENTACION DE ARCHIVOS.\n ('x' FINALIZAR)"
 	//comando := "exec –path->/home/Desktop/calificacion.mia"
 
-	comando1 := "exec -path->/home/eljuanjoramos/Escritorio/archivo"
+	comando1 := "exec -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/archivo\""
 	//comando1 := "Mkdisk -size->32 -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/\" -name->Disco1.dsk -uniT->k"
 	//var arCommand []string = strings.Split(comando1, " ")
 

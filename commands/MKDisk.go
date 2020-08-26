@@ -1,4 +1,4 @@
-package commandExecute
+package commands
 
 import (
 	"bytes"
@@ -9,8 +9,7 @@ import (
 	"time"
 	"unsafe"
 
-	FUNCTIONCONTROLLER "../controller"
-	REPORTS "../reports"
+	FUNCTION "../functions"
 	STRUCTURES "../structures"
 )
 
@@ -18,7 +17,7 @@ import (
 func WriteFile(name string, path string, size int64) {
 
 	//Mando a crear el directorio
-	FUNCTIONCONTROLLER.CreateADirectory(path)
+	FUNCTION.CreateADirectory(path)
 	//Se crea el archivo
 	file, err := os.Create(path + name)
 	defer file.Close()
@@ -62,7 +61,7 @@ func WriteFile(name string, path string, size int64) {
 	var binario3 bytes.Buffer
 	binary.Write(&binario3, binary.BigEndian, s1)
 	escribirBytes(file, binario3.Bytes())
-	REPORTS.CreateMBRReport(disco)
+	//REPORTS.CreateMBRReport(disco)
 }
 
 //Método para escribir en un archivo.

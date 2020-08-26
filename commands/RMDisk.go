@@ -1,4 +1,4 @@
-package commandExecute
+package commands
 
 import (
 	"bufio"
@@ -7,12 +7,12 @@ import (
 	"runtime"
 	"strings"
 
-	FUNCTIONCONTROLLER "../controller"
+	FUNCTION "../functions"
 )
 
 func RemoveDisk(path string) {
 	//Le quito las comillas al path
-	var str = FUNCTIONCONTROLLER.RemoveComilla(FUNCTIONCONTROLLER.ReplaceAll(path))
+	var str = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(path))
 
 	if _, err := os.Stat(str); os.IsNotExist(err) {
 		fmt.Println("The file or directory does not exist")

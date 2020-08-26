@@ -1,4 +1,4 @@
-package commandExecute
+package commands
 
 import (
 	"bufio"

@@ -1,0 +1,30 @@
+hello world
+
+esto es un texto
+
+//esto es un comentario
+
+/*
+  esto es 
+  
+  un comentario multilinea
+  
+*/
+
+
+Mkdisk -size->1 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Disco1.dsk -uniT->k
+//readdisk -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk"
+//pause
+Fdisk -sizE->72 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk" -name->Part21
+//Fdisk -sizE->100 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk" -name->Particion2
+//Fdisk -sizE->25 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk" -name->Particion3
+//Fdisk -sizE->35 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk" -name->Particion4
+//pause
+//readdisk -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk"
+pause
+mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk" -name->Part1 
+mount
+
+////spew.Dump(m.Mbr_partition_1)
+//go get -u github.com/davecgh/go-spew/spew
+	
