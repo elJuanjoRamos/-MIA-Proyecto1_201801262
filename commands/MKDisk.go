@@ -3,18 +3,18 @@ package commands
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"time"
-	"unsafe"
 
 	FUNCTION "../functions"
 	STRUCTURES "../structures"
 )
 
 //Método para escribir en un archivo
-func WriteFile(name string, path string, size int64) {
+func CreateFile(name string, path string, size int64) {
 
 	//Mando a crear el directorio
 	FUNCTION.CreateADirectory(path)
@@ -25,9 +25,9 @@ func WriteFile(name string, path string, size int64) {
 		log.Fatal(err)
 	}
 
-	var otro int8 = 0
+	var init int8 = 0
 
-	s := &otro
+	s := &init
 
 	//Escribimos un 0 en el inicio del archivo.
 	var binario bytes.Buffer
@@ -42,6 +42,16 @@ func WriteFile(name string, path string, size int64) {
 	binary.Write(&binario2, binary.BigEndian, s)
 	escribirBytes(file, binario2.Bytes())
 
+}
+
+func WriteFile(path string) {
+
+	//Abrimos el archivo
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+	defer file.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
 	//----------------------------------------------------------------------- //
 	//Escribimos nuestro struct en el inicio del archivo
 
@@ -51,16 +61,15 @@ func WriteFile(name string, path string, size int64) {
 	var time = time.Now()
 
 	//Asignamos valores a los atributos del struct.
-	disco := STRUCTURES.MBR{Mbr_disk_signature: random, Mbr_count: 4}
+	disco := STRUCTURES.MBR{Mbr_disk_signature: random, Mbr_count: 4, Mbr_size: FUNCTION.FileSize(path)}
 	copy(disco.Mbr_creation_date[:], time.Format("2006-01-02 15:04:05"))
-	var sizeDisk int64 = int64(unsafe.Sizeof(disco))
-	disco.Mbr_size = sizeDisk
 
 	//Escribimos struct.
 	s1 := &disco
 	var binario3 bytes.Buffer
 	binary.Write(&binario3, binary.BigEndian, s1)
 	escribirBytes(file, binario3.Bytes())
+
 	//REPORTS.CreateMBRReport(disco)
 }
 

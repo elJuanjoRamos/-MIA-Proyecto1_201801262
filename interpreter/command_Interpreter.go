@@ -176,7 +176,9 @@ func MKDiskCommand(arCommand []string) {
 		if unit == 0 {
 			unit = 1024 * 1024
 		}
-		EXECUTE.WriteFile(name, path, unit*size)
+		EXECUTE.CreateFile(name, path, unit*size)
+		EXECUTE.WriteFile(path + name)
+
 		//EXECUTE.CreateReport()
 	}
 
@@ -198,8 +200,8 @@ func FDiskCommand(arCommand []string) {
 	var unit int64 = 0
 	var path string
 	var name string
-	var types byte = 0
-	var fit byte = 0
+	var types string = "P"
+	var fit string = "WF"
 	//var deletes string
 	//var adds string
 	var error bool = false
@@ -238,9 +240,19 @@ func FDiskCommand(arCommand []string) {
 		case "-name":
 			name = FUNCTION.ReplaceAll(commandToExecute[1])
 		case "-type":
-			types = commandToExecute[1][0]
+			if strings.ToLower(commandToExecute[1]) == "p" || strings.ToLower(commandToExecute[1]) == "l" || strings.ToLower(commandToExecute[1]) == "e" {
+				types = commandToExecute[1]
+			} else {
+				error = true
+				fmt.Println("No se reconoce el tipo de particion a crear")
+			}
 		case "-fit":
-			fit = commandToExecute[1][0]
+			if strings.ToLower(commandToExecute[1]) == "bf" || strings.ToLower(commandToExecute[1]) == "ff" || strings.ToLower(commandToExecute[1]) == "wf" {
+				fit = commandToExecute[1]
+			} else {
+				error = true
+				fmt.Println("No se reconoce el ajuste de particion a crear")
+			}
 		case "-delete":
 			//deletes = commandToExecute[1]
 		case "-add":
@@ -253,23 +265,13 @@ func FDiskCommand(arCommand []string) {
 		if unit == 0 {
 			unit = 1024
 		}
-		if fit == 0 {
-			fit = 'W'
-		}
-		if types == 0 {
-			types = 'P'
-		}
+
 		EXECUTE.FormatDisk(path, unit*size, name, types, fit)
 
 	}
-	/*fmt.Println("------------------ ")
-	fmt.Println("Comando: " + comando)
-	fmt.Println("Size: ", size)
-	fmt.Println("Path: " + path)
-	fmt.Println("Name: " + name)
-	fmt.Println("Unit: ", unit)
-	fmt.Println("Delete: " + deletes)
-	fmt.Println("Add: " + adds)*/
+
+	//fmt.Println("Delete: " + deletes)
+	//fmt.Println("Add: " + adds)
 
 }
 

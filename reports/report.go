@@ -3,7 +3,6 @@ package reports
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 
 	CONTROLLER "../functions"
@@ -50,7 +49,7 @@ func CreateMBRReport(mbr STRUCTURES.MBR) {
 	arg3 := "\"" + rootDir + "/reports/pngs/mbr.png" + "\""
 
 	fmt.Println(app + " " + arg0 + " " + arg1 + " " + arg2 + " " + arg3)
-	cmd := exec.Command(app, arg0, arg1, arg2, arg3)
+	/*cmd := exec.Command(app, arg0, arg1, arg2, arg3)
 	stdout, err := cmd.Output()
 
 	if err != nil {
@@ -58,28 +57,26 @@ func CreateMBRReport(mbr STRUCTURES.MBR) {
 		return
 	}
 
-	fmt.Println(string(stdout))
+	fmt.Println(string(stdout))*/
 
 }
 
 func verifyPartition(partition STRUCTURES.PARTITION, body string, size int) string {
-	if partition.Part_active {
 
-		var s string
-		for _, v := range partition.Part_name {
-			if v != 0 {
-				s = s + string(v)
-			}
+	var s string
+	for _, v := range partition.Part_name {
+		if v != 0 {
+			s = s + string(v)
 		}
-		body = body + "<TR>" + "<TD>" + s + "</TD>" + "</TR>" +
-			"<TR>" + "<TD>Partition Number</TD>" + "<TD>" + strconv.Itoa(size) + "</TD>" + "</TR>" +
-			"<TR>" + "<TD>Part_status</TD>" + "<TD>" + string(partition.Part_status) + "</TD>" + "</TR>" +
-			"<TR>" + "<TD>Part_type</TD>" + "<TD>" + string(partition.Part_type) + "</TD>" + "</TR>" +
-			"<TR>" + "<TD>Part_fit</TD>" + "<TD>" + string(partition.Part_fit) + "</TD>" + "</TR>" +
-
-			"<TR>" + "<TD>Part_start</TD>" + "<TD>" + strconv.Itoa(int(partition.Part_start)) + "</TD>" + "</TR>" +
-			"<TR>" + "<TD>Part_size</TD>" + "<TD>" + strconv.Itoa(int(partition.Part_size)) + "</TD>" + "</TR>"
-
 	}
+	body = body + "<TR>" + "<TD>" + s + "</TD>" + "</TR>" +
+		"<TR>" + "<TD>Partition Number</TD>" + "<TD>" + strconv.Itoa(size) + "</TD>" + "</TR>" +
+		"<TR>" + "<TD>Part_status</TD>" + "<TD>" + strconv.Itoa(int(partition.Part_status)) + "</TD>" + "</TR>" +
+		"<TR>" + "<TD>Part_type</TD>" + "<TD>" + string(partition.Part_type) + "</TD>" + "</TR>" +
+		"<TR>" + "<TD>Part_fit</TD>" + "<TD>" + string(partition.Part_fit) + "</TD>" + "</TR>" +
+
+		"<TR>" + "<TD>Part_start</TD>" + "<TD>" + strconv.Itoa(int(partition.Part_start)) + "</TD>" + "</TR>" +
+		"<TR>" + "<TD>Part_size</TD>" + "<TD>" + strconv.Itoa(int(partition.Part_size)) + "</TD>" + "</TR>"
+
 	return body
 }

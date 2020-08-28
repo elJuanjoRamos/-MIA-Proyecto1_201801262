@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path"
@@ -60,7 +61,7 @@ func IfContains(str string, strContains string) bool {
 
 //================FUNCIONES ESPECIALES
 
-//Verifica si existe un archivo o ruta
+//Verifica si existe una ruta
 
 func IfExistDirectoryOrPath(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -69,6 +70,16 @@ func IfExistDirectoryOrPath(path string) bool {
 	} else {
 		return true
 	}
+}
+
+//Verifica si existe o no un archivo
+func IfExistFile(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		fmt.Println("No existe el archivo solicitado")
+		return false
+	}
+	return !info.IsDir()
 }
 
 //Crea un directorio si no existe
@@ -91,4 +102,44 @@ func RootDir() string {
 	_, b, _, _ := runtime.Caller(0)
 	d := path.Join(path.Dir(b))
 	return filepath.Dir(d)
+}
+
+func FileSize(path string) int64 {
+	if IfExistFile(path) {
+		file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+		defer file.Close()
+		if err != nil {
+			fmt.Println(err)
+			return 0
+		} else {
+			fi, err := os.Stat(path)
+			if err != nil {
+				fmt.Println(err)
+			}
+			return fi.Size()
+
+		}
+	}
+	return 0
+}
+
+//REVISA EL CONTENIDO DEL ARCHIVO BINARIO
+func ContentPrint(path string) {
+	file2, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+	defer file2.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+	stats, statsErr := file2.Stat()
+	if statsErr != nil {
+		fmt.Println("erro")
+	}
+
+	var sizes int64 = stats.Size()
+	bytess := make([]byte, sizes)
+
+	bufr := bufio.NewReader(file2)
+	_, err = bufr.Read(bytess)
+
+	fmt.Println(bytess)
 }

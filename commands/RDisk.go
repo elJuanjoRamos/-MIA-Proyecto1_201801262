@@ -16,6 +16,25 @@ import (
 //	FUNCION PARA LEER ARCHIVOS
 func ReadFile(path string) {
 
+	/*file2, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+	defer file2.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	stats, statsErr := file2.Stat()
+	if statsErr != nil {
+		fmt.Println("erro")
+	}
+
+	var sizes int64 = stats.Size()
+	bytess := make([]byte, sizes)
+
+	bufr := bufio.NewReader(file2)
+	_, err = bufr.Read(bytess)
+
+	fmt.Println(bytess)*/
+
 	//Abrimos/creamos un archivo.
 	file, err := os.Open(path)
 	defer file.Close()
