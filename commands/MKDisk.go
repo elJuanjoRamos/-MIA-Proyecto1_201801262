@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	CONTROLLER "../controllers"
 	FUNCTION "../functions"
 	STRUCTURES "../structures"
 )
@@ -24,7 +25,7 @@ func CreateFile(name string, path string, size int64) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	CONTROLLER.AddNewExtendedDisk(name)
 	var init int8 = 0
 
 	s := &init

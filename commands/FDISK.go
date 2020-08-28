@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"unsafe"
 
@@ -47,85 +48,88 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 			}
 
 			//Se revisan la cantidad de particiones disponibles en el disco
-			if m.Mbr_count > 0 {
-				//REVISO EL TIPO DE PARTICION
+			//if m.Mbr_count > 0 {
+			//REVISO EL TIPO DE PARTICION
 
-				//Si la particion es primaria, simplemente se manda a crear
-				if partitionType == "P" {
-					m = CreatePartition(m, partitionType, partitionFit, mbrSize, partitionSize, partitionName)
+			//Si la particion es primaria, simplemente se manda a crear
+			if partitionType == "P" {
+				m = CreatePartition(m, partitionType, partitionFit, mbrSize, partitionSize, partitionName, "")
+				FullPartition(m.Mbr_partition_1, file, 1)
+				FullPartition(m.Mbr_partition_2, file, 2)
+				//FullPartition(m.Mbr_partition_3, file, 3)
+				FullPartition(m.Mbr_partition_4, file, 4)
+				//Si la paticion es extendida
+			} else if partitionType == "E" {
+				//Si el disco aun no tiene particiones extendidas, mando a crear la particion extendida y
+				//Cambio la bandera a 1, eso quiere decir que ya tiene particiones extendidas dentro
+				if m.Mbr_Ext == 0 {
+
+					filename := filepath.Base(path)
+					m = CreatePartition(m, partitionType, partitionFit, mbrSize, partitionSize, partitionName, filename)
 					FullPartition(m.Mbr_partition_1, file, 1)
 					FullPartition(m.Mbr_partition_2, file, 2)
 					//FullPartition(m.Mbr_partition_3, file, 3)
 					FullPartition(m.Mbr_partition_4, file, 4)
-					//Si la paticion es extendida
-				} else if partitionType == "E" {
-					//Si el disco aun no tiene particiones extendidas, mando a crear la particion extendida y
-					//Cambio la bandera a 1, eso quiere decir que ya tiene particiones extendidas dentro
-					if m.Mbr_Ext == 0 {
-						m = CreatePartition(m, partitionType, partitionFit, mbrSize, partitionSize, partitionName)
-						FullPartition(m.Mbr_partition_1, file, 1)
-						FullPartition(m.Mbr_partition_2, file, 2)
-						//FullPartition(m.Mbr_partition_3, file, 3)
-						FullPartition(m.Mbr_partition_4, file, 4)
-						m.Mbr_Ext = 1
+					m.Mbr_Ext = 1
 
-					} else {
-						fmt.Println("No se pueden crear mas particiones extendidas en el disco")
-					}
-
-				} else if partitionType == "L" {
-					//VALIDO QUE EL DISCO TENGA UNA PARTICION EXTENDIDA
-					if m.Mbr_Ext == 1 {
-						CONTROLLER.AddLogicPartition(partitionType, partitionFit, partitionSize, partitionName)
-
-					} else {
-						fmt.Println("No se ha creado una particion extendida para el disco")
-					}
+				} else {
+					fmt.Println("No se pueden crear mas particiones extendidas en el disco")
 				}
 
-				//Se situa en la posicion 0,0 del archivo
-				file.Seek(0, 0)
-				//Escribe el mbr con particiones en el archivo
-				s1 := &m
-				var binario3 bytes.Buffer
-				binary.Write(&binario3, binary.BigEndian, s1)
-				escribirBytes(file, binario3.Bytes())
+			} else if partitionType == "L" {
+				//VALIDO QUE EL DISCO TENGA UNA PARTICION EXTENDIDA
+				if m.Mbr_Ext == 1 {
+					CONTROLLER.AddLogicPartition(partitionType, partitionFit, partitionSize, partitionName, filepath.Base(path))
 
-				//REPORTS.CreateMBRReport(m)
-			} else {
-				fmt.Println("No se puede escribir mas particiones en el disco")
+				} else {
+					fmt.Println("No se ha creado una particion extendida para el disco")
+				}
 			}
+
+			//Se situa en la posicion 0,0 del archivo
+			file.Seek(0, 0)
+			//Escribe el mbr con particiones en el archivo
+			s1 := &m
+			var binario3 bytes.Buffer
+			binary.Write(&binario3, binary.BigEndian, s1)
+			escribirBytes(file, binario3.Bytes())
+
+			//REPORTS.CreateMBRReport(m)
+			/*} else {
+				fmt.Println("No se puede escribir mas particiones en el disco")
+			}*/
 
 		}
 	}
-	if partitionType == "E" {
-		CONTROLLER.FullEBR(path, partitionSize, partitionName)
+	if partitionType == "E" || partitionType == "L" {
+		filename := filepath.Base(path)
+		CONTROLLER.FullEBR(filename, path)
 	}
 }
 
-func CreatePartition(m STRUCTURES.MBR, partitionType string, partitionFit string, mbrSize int, partitionSize int64, partitionName string) STRUCTURES.MBR {
+func CreatePartition(m STRUCTURES.MBR, partitionType string, partitionFit string, mbrSize int, partitionSize int64, partitionName string, filename string) STRUCTURES.MBR {
 	//Verifica si la paticion 1 esta vacia
 	if m.Mbr_partition_1.Part_isEmpty == 0 {
-		m.Mbr_partition_1 = AssemblePartition(partitionType, partitionFit[0], int64(mbrSize), partitionSize, partitionName)
+		m.Mbr_partition_1 = AssemblePartition(partitionType, partitionFit[0], int64(mbrSize), partitionSize, partitionName, filename)
 		m.Mbr_count = 3
 		//Verifica si la paticion 2 esta vacia
 	} else if m.Mbr_partition_2.Part_isEmpty == 0 {
-		m.Mbr_partition_2 = AssemblePartition(partitionType, partitionFit[0], m.Mbr_partition_1.Part_end, partitionSize, partitionName)
+		m.Mbr_partition_2 = AssemblePartition(partitionType, partitionFit[0], m.Mbr_partition_1.Part_end, partitionSize, partitionName, filename)
 		m.Mbr_count = 2
 		//Verifica si la paticion 3 esta vacia
 	} else if m.Mbr_partition_3.Part_isEmpty == 0 {
-		m.Mbr_partition_3 = AssemblePartition(partitionType, partitionFit[0], m.Mbr_partition_2.Part_end, partitionSize, partitionName)
+		m.Mbr_partition_3 = AssemblePartition(partitionType, partitionFit[0], m.Mbr_partition_2.Part_end, partitionSize, partitionName, filename)
 		m.Mbr_count = 1
 		//Verifica si la paticion 4 esta vacia
 	} else if m.Mbr_partition_4.Part_isEmpty == 0 {
-		m.Mbr_partition_4 = AssemblePartition(partitionType, partitionFit[0], m.Mbr_partition_3.Part_end, partitionSize, partitionName)
+		m.Mbr_partition_4 = AssemblePartition(partitionType, partitionFit[0], m.Mbr_partition_3.Part_end, partitionSize, partitionName, filename)
 		m.Mbr_count = 0
 	}
 	return m
 }
 
 //Arma la particion con la data necesaria
-func AssemblePartition(types string, fit byte, end int64, size int64, name string) STRUCTURES.PARTITION {
+func AssemblePartition(types string, fit byte, end int64, size int64, name string, filename string) STRUCTURES.PARTITION {
 
 	var part = STRUCTURES.PARTITION{
 		Part_status:  1,
@@ -139,7 +143,7 @@ func AssemblePartition(types string, fit byte, end int64, size int64, name strin
 	part.Part_end = part.Part_start + size
 
 	if strings.ToLower(types) == "e" {
-		CONTROLLER.AddExtended(1, fit, part.Part_start, part.Part_end, size, name)
+		CONTROLLER.AddExtended(1, fit, part.Part_start, part.Part_end, size, name, filename)
 	}
 	return part
 
