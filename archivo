@@ -12,17 +12,24 @@ esto es un texto
 */
 
 //201801262
-Mkdisk -size->5 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Hoja1_201801262.dsk -uniT->k
+Mkdisk -size->10 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Hoja1_201801262.dsk -uniT->k
 Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part1
 Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part2
-Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->E -name->Part3
+Fdisk -sizE->5 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->E -name->Part3
 Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part4
-fdisk -sizE->1 -type->L -unit->M -fit->BF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk"  -name->Logica3
-//pause
-//readdisk -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk"
-//pause
-//mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Disco1.dsk" -name->Part1 
-//mount
+pause
+readdisk -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk"
+pause
+mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part1 
+mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part4 
+pause
+mount
+pause
+mkfs -id->vda1 -type->fast
+mkfs -id->vdb1 -type->fast
+pause
+mkfs -id->vda1 -type->full
+pause
 
 ////spew.Dump(m.Mbr_partition_1)
 //go get -u github.com/davecgh/go-spew/spew

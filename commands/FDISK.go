@@ -54,11 +54,7 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 			//Si la particion es primaria, simplemente se manda a crear
 			if partitionType == "P" {
 				m = CreatePartition(m, partitionType, partitionFit, mbrSize, partitionSize, partitionName, "")
-				FullPartition(m.Mbr_partition_1, file, 1)
-				FullPartition(m.Mbr_partition_2, file, 2)
-				//FullPartition(m.Mbr_partition_3, file, 3)
-				FullPartition(m.Mbr_partition_4, file, 4)
-				//Si la paticion es extendida
+
 			} else if partitionType == "E" {
 				//Si el disco aun no tiene particiones extendidas, mando a crear la particion extendida y
 				//Cambio la bandera a 1, eso quiere decir que ya tiene particiones extendidas dentro
@@ -66,10 +62,6 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 
 					filename := filepath.Base(path)
 					m = CreatePartition(m, partitionType, partitionFit, mbrSize, partitionSize, partitionName, filename)
-					FullPartition(m.Mbr_partition_1, file, 1)
-					FullPartition(m.Mbr_partition_2, file, 2)
-					//FullPartition(m.Mbr_partition_3, file, 3)
-					FullPartition(m.Mbr_partition_4, file, 4)
 					m.Mbr_Ext = 1
 
 				} else {
@@ -101,10 +93,13 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 
 		}
 	}
-	if partitionType == "E" || partitionType == "L" {
-		filename := filepath.Base(path)
-		CONTROLLER.FullEBR(filename, path)
-	}
+
+}
+
+func SendToFull(path string) {
+	filename := filepath.Base(path)
+	CONTROLLER.FullEBR(filename, path)
+
 }
 
 func CreatePartition(m STRUCTURES.MBR, partitionType string, partitionFit string, mbrSize int, partitionSize int64, partitionName string, filename string) STRUCTURES.MBR {
@@ -147,15 +142,4 @@ func AssemblePartition(types string, fit byte, end int64, size int64, name strin
 	}
 	return part
 
-}
-
-func FullPartition(partition STRUCTURES.PARTITION, file *os.File, number int8) {
-	for i := partition.Part_start; i < partition.Part_end+1; i++ {
-		var init int8 = 'P' + number
-		o := &init
-		file.Seek(i, 0)
-		var binarioTemp bytes.Buffer
-		binary.Write(&binarioTemp, binary.BigEndian, o)
-		escribirBytes(file, binarioTemp.Bytes())
-	}
 }

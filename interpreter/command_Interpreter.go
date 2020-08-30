@@ -50,6 +50,10 @@ func GetCommand(commandEntry string) {
 		fmt.Println("--" + commandEntry)
 		ReadDiskCommand(arCommand[1])
 		break
+	case "mkfs":
+		fmt.Println("--" + commandEntry)
+		MKfsCommand(arCommand)
+		break
 
 	default:
 
@@ -62,7 +66,7 @@ func ReadDiskCommand(arCommand string) {
 	var commandToExecute []string = strings.Split(arCommand, "->")
 	var path string = FUNCTION.ReplaceAll(FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1])))
 	EXECUTE.ReadFile(path)
-
+	//EXECUTE.SendToFull(path)
 }
 
 //=========================EXEC COMMAND
@@ -300,5 +304,70 @@ func MOUNTCommand(arCommand []string) {
 		EXECUTE.Mount(path, name)
 	} else {
 		EXECUTE.MountPrint()
+	}
+}
+
+/*					PARTE 2 		*/
+
+//==== MKFS COMMAND
+
+func MKfsCommand(arCommand []string) {
+
+	var id string
+	var types string = "full"
+	var add int64 = 0
+	var unit int64 = 0
+
+	//Manejar un error
+	var error bool = false
+
+	for i := 1; i < len(arCommand); i++ {
+		var commandToExecute = strings.Split(arCommand[i], "->")
+		var aux string = strings.ToLower(commandToExecute[0])
+		switch aux {
+		case "-id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+		case "-type":
+			types = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+		case "-unit":
+
+			if strings.ToLower(commandToExecute[1]) == "k" {
+				unit = 1024
+			} else if strings.ToLower(commandToExecute[1]) == "m" {
+				unit = 1024 * 1024
+			} else if strings.ToLower(commandToExecute[1]) == "b" {
+				unit = 1
+			} else {
+				fmt.Println("Error, no se reconoce el tipo " + commandToExecute[1])
+				error = true
+			}
+		case "-add":
+
+			temp, err := strconv.Atoi(commandToExecute[1])
+			if err == nil {
+				add = int64(temp)
+			} else {
+				fmt.Println("Error, el size establecido no se puede convertir a numero")
+				error = true
+			}
+
+		}
+	}
+	//Verifica que no haya error
+	if !error {
+		//Cuando las unidades son diferentes a cero, significa que se quiere agregar o quitar espacio de la particion
+		//especificcada con el id
+		if unit != 0 && add != 0 {
+
+			//si las unidades son cero, significa que solo se quiere formatear la unidad
+		} else {
+			EXECUTE.MKFSFormatPartition(id, types)
+		}
+
+		//si unit = 0, significa que no vino en el comando, por default es 1 Mb
+		//EXECUTE.CreateFile(name, path, unit*size)
+		//EXECUTE.WriteFile(path + name)
+
+		//EXECUTE.CreateReport()
 	}
 }

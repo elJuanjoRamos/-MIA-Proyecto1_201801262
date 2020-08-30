@@ -65,6 +65,7 @@ func FullEBR(filename string, path string) {
 		for i := 0; i < len(array); i++ {
 			if array[i].diskName == filename {
 				var particionExtendidaAuxiliar = array[i].extendedPartition
+
 				for i := 0; i < len(particionExtendidaAuxiliar.Part_ebr); i++ {
 					var ebrAuxiliar = particionExtendidaAuxiliar.Part_ebr[i]
 					file.Seek(ebrAuxiliar.Part_start, 0)
@@ -72,19 +73,20 @@ func FullEBR(filename string, path string) {
 					var binario3 bytes.Buffer
 					binary.Write(&binario3, binary.BigEndian, s1)
 					escribirBytes(file, binario3.Bytes())
-					break
+
 				}
-				if len(particionExtendidaAuxiliar.Part_partition) != 0 {
-					for i := 0; i < len(particionExtendidaAuxiliar.Part_partition); i++ {
-						var ebrAuxiliar = particionExtendidaAuxiliar.Part_partition[i]
-						file.Seek(ebrAuxiliar.Part_start, 0)
-						s1 := &ebrAuxiliar
-						var binario3 bytes.Buffer
-						binary.Write(&binario3, binary.BigEndian, s1)
-						escribirBytes(file, binario3.Bytes())
-						break
-					}
-				}
+				/*
+					if len(particionExtendidaAuxiliar.Part_partition) != 0 {
+						for i := 0; i < len(particionExtendidaAuxiliar.Part_partition); i++ {
+							var ebrAuxiliar = particionExtendidaAuxiliar.Part_partition[i]
+							file.Seek(ebrAuxiliar.Part_start, 0)
+							s1 := &ebrAuxiliar
+							var binario3 bytes.Buffer
+							binary.Write(&binario3, binary.BigEndian, s1)
+							escribirBytes(file, binario3.Bytes())
+							break
+						}
+					}*/
 				break
 			}
 		}
@@ -104,6 +106,7 @@ func AddLogicPartition(partitionType string, partitionFit string, partitionSize 
 		if array[i].diskName == filename {
 			var particionExtendidaAuxiliar = array[i].extendedPartition
 
+			//Verifico si es primera creacion de logica, eso quiere ecir que el arreglo de ebr va a tener 1 y el arreglo de particiones ninguno
 			if len(particionExtendidaAuxiliar.Part_ebr) == 1 && len(particionExtendidaAuxiliar.Part_partition) == 0 {
 				particionExtendidaAuxiliar.Part_ebr[0].Part_fit = partitionFit[0]
 				copy(particionExtendidaAuxiliar.Part_ebr[0].Part_name[:], "EBR"+partitionName)
@@ -112,7 +115,32 @@ func AddLogicPartition(partitionType string, partitionFit string, partitionSize 
 					particionExtendidaAuxiliar.Part_ebr[0].Part_end, partitionSize, partitionName)
 
 				array[i].extendedPartition.Part_partition = append(array[i].extendedPartition.Part_partition, particionAux)
+
+				//Sinifica que el arreglo de ebr y particiones ya son iguales y
 			} else {
+
+				//SE MANIPULA EL EBR ANTERIOR
+				//Se obtiene la longitud del ebr
+				var lenEbr int = len(array[i].extendedPartition.Part_ebr)
+				//Se obtiene la longitud de la paticion logica asociada al ebr
+				var lenPart int = len(array[i].extendedPartition.Part_partition)
+
+				//Se le asigna al ebr anterior el puntero del siguiente ebr que sera, el bit siguiente a donde termina la particion logica
+				//asociada a ese ebr
+				array[i].extendedPartition.Part_ebr[lenEbr-1].Part_next = array[i].extendedPartition.Part_partition[lenPart-1].Part_end + 1
+
+				var ebrPartition = CreateEBR(1, partitionFit[0], array[i].extendedPartition.Part_partition[lenPart-1].Part_end+1,
+					int64(unsafe.Sizeof(STRUCTURES.EBR{})), -1, "EBR"+partitionName)
+
+				//Guardamos el ebr que creamos
+				array[i].extendedPartition.Part_ebr = append(array[i].extendedPartition.Part_ebr, ebrPartition)
+
+				//volvemos a obtener el len del arreglo de ebr
+				lenEbr = len(array[i].extendedPartition.Part_ebr)
+
+				var primPartition = CreatePartition("L", partitionFit[0], array[i].extendedPartition.Part_ebr[lenEbr-1].Part_end, partitionSize, partitionName)
+				//Guaramos la particion
+				array[i].extendedPartition.Part_partition = append(array[i].extendedPartition.Part_partition, primPartition)
 
 			}
 
@@ -150,4 +178,51 @@ func CreatePartition(types string, fit byte, end int64, size int64, name string)
 
 	return part
 
+}
+
+func SearchPartition(diskName string, partitionName string) bool {
+
+	for i := 0; i < len(array); i++ {
+		var aux = array[i]
+		if aux.diskName == diskName {
+
+			for j := 0; j < len(aux.extendedPartition.Part_partition); j++ {
+				var partition = aux.extendedPartition.Part_partition[j]
+				if AssemblePartName(partition.Part_name) == partitionName {
+					return true
+				}
+			}
+			break
+		}
+	}
+	return false
+}
+
+func GetLogicPartition(diskName string, partitionName string) STRUCTURES.PARTITION {
+
+	var partition = STRUCTURES.PARTITION{}
+	for i := 0; i < len(array); i++ {
+		var aux = array[i]
+		if aux.diskName == diskName {
+
+			for j := 0; j < len(aux.extendedPartition.Part_partition); j++ {
+				partition = aux.extendedPartition.Part_partition[j]
+				if AssemblePartName(partition.Part_name) == partitionName {
+					return partition
+				}
+			}
+			break
+		}
+	}
+	return partition
+}
+
+func AssemblePartName(name [16]byte) string {
+	var s string = ""
+	for _, v := range name {
+		if v != 0 {
+			s = s + string(v)
+		}
+	}
+	return s
 }

@@ -57,4 +57,5 @@ type MOUNT struct {
 	Mount_path      string
 	Mount_particion string
 	Mount_estado    bool
+	Mount_part      PARTITION
 }
