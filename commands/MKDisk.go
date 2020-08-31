@@ -25,6 +25,7 @@ func CreateFile(name string, path string, size int64) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//Se manda a guardar el nombre del disco por si se crean particiones extendidas
 	CONTROLLER.AddNewExtendedDisk(name)
 	var init int8 = 0
 

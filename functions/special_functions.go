@@ -3,6 +3,7 @@ package functions
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -95,6 +96,29 @@ func CreateADirectory(path string) {
 			fmt.Println("El directorio fue creado correctamente")
 		}
 	}
+}
+
+func CreateAFile(path string, text string) {
+
+	if !IfExistFile(path) {
+		//Se crea el archivo user txt que contiene
+		file, err := os.Create(path)
+		defer file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		l, err := file.WriteString(text)
+		if err != nil {
+			fmt.Println(err)
+			file.Close()
+			return
+		} else {
+			fmt.Println(l)
+		}
+	} else {
+		fmt.Println("El archivo ya existe")
+	}
+
 }
 
 //Retorna la ruta del proyecto

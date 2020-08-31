@@ -26,11 +26,13 @@ pause
 mount
 pause
 mkfs -id->vda1 -type->fast
-mkfs -id->vdb1 -type->fast
+mkfs -id->vdb1 -type->full
+//pause
+//mkfs -id->vda1 -type->full
 pause
-mkfs -id->vda1 -type->full
-pause
-
+login &usr->root &pwd->201801262 &id->vda1
+logout
+logout
 ////spew.Dump(m.Mbr_partition_1)
 //go get -u github.com/davecgh/go-spew/spew
 	

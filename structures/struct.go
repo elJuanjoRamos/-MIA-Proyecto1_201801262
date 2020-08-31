@@ -56,6 +56,16 @@ type MOUNT struct {
 	Mount_id        string
 	Mount_path      string
 	Mount_particion string
+	Mount_usrtxt    string
 	Mount_estado    bool
 	Mount_part      PARTITION
+}
+
+type USER struct {
+	User_id       string
+	User_type     string
+	User_group    string
+	User_username string
+	User_password string
+	User_isLoged  bool
 }

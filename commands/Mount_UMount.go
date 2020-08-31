@@ -144,6 +144,7 @@ func GetPartitionName(name [16]byte) string {
 	return s
 }
 
+//BUsca una particion por id, retorna true si existe, false si no
 func SearchPartitionById(id string) bool {
 	for i := 0; i < 100; i++ {
 		for j := 0; j < 26; j++ {
@@ -155,6 +156,7 @@ func SearchPartitionById(id string) bool {
 	return false
 }
 
+//Busca una particion por id, retorna la particion montada
 func GetPartitionById(id string) STRUCTURES.MOUNT {
 	for i := 0; i < 100; i++ {
 		for j := 0; j < 26; j++ {
@@ -164,4 +166,16 @@ func GetPartitionById(id string) STRUCTURES.MOUNT {
 		}
 	}
 	return STRUCTURES.MOUNT{}
+}
+
+//update user txt, le da la ruta del archivo txt de usuarios asignado a esa particion
+func UpdateUserTxt(id string, path string) {
+	for i := 0; i < 100; i++ {
+		for j := 0; j < 26; j++ {
+			if MountList[i][j].Mount_id == id {
+				MountList[i][j].Mount_usrtxt = path
+				break
+			}
+		}
+	}
 }

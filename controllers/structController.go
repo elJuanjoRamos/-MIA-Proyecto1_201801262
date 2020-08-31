@@ -75,18 +75,6 @@ func FullEBR(filename string, path string) {
 					escribirBytes(file, binario3.Bytes())
 
 				}
-				/*
-					if len(particionExtendidaAuxiliar.Part_partition) != 0 {
-						for i := 0; i < len(particionExtendidaAuxiliar.Part_partition); i++ {
-							var ebrAuxiliar = particionExtendidaAuxiliar.Part_partition[i]
-							file.Seek(ebrAuxiliar.Part_start, 0)
-							s1 := &ebrAuxiliar
-							var binario3 bytes.Buffer
-							binary.Write(&binario3, binary.BigEndian, s1)
-							escribirBytes(file, binario3.Bytes())
-							break
-						}
-					}*/
 				break
 			}
 		}
@@ -149,6 +137,7 @@ func AddLogicPartition(partitionType string, partitionFit string, partitionSize 
 	}
 }
 
+//Crea un ebr con los datos necesarios y los retorna
 func CreateEBR(status int8, fit byte, start int64, size int64, next int64, name string) STRUCTURES.EBR {
 	var ebr = STRUCTURES.EBR{
 		Part_status: status,
@@ -163,6 +152,7 @@ func CreateEBR(status int8, fit byte, start int64, size int64, next int64, name 
 	return ebr
 }
 
+//Arma una particion con los datos necesarios y la retorna
 func CreatePartition(types string, fit byte, end int64, size int64, name string) STRUCTURES.PARTITION {
 
 	var part = STRUCTURES.PARTITION{
@@ -180,6 +170,7 @@ func CreatePartition(types string, fit byte, end int64, size int64, name string)
 
 }
 
+//Busca una particion dentro del arreglo de particiones
 func SearchPartition(diskName string, partitionName string) bool {
 
 	for i := 0; i < len(array); i++ {
@@ -217,6 +208,7 @@ func GetLogicPartition(diskName string, partitionName string) STRUCTURES.PARTITI
 	return partition
 }
 
+//Retorna un string de nombre que antes eran bytes
 func AssemblePartName(name [16]byte) string {
 	var s string = ""
 	for _, v := range name {

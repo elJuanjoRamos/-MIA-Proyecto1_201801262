@@ -54,7 +54,18 @@ func GetCommand(commandEntry string) {
 		fmt.Println("--" + commandEntry)
 		MKfsCommand(arCommand)
 		break
-
+	case "login":
+		fmt.Println("--" + commandEntry)
+		LoginCommand(arCommand)
+		break
+	case "logout":
+		fmt.Println("--" + commandEntry)
+		LogOutCommand()
+		break
+	case "mkgrp":
+		fmt.Println("--" + commandEntry)
+		MKGroupCommand(arCommand)
+		break
 	default:
 
 	}
@@ -369,5 +380,88 @@ func MKfsCommand(arCommand []string) {
 		//EXECUTE.WriteFile(path + name)
 
 		//EXECUTE.CreateReport()
+	}
+}
+
+//===== LOGIN
+func LoginCommand(arCommand []string) {
+	var usr string = ""
+	var pwd string = ""
+	var id string = ""
+
+	//Manejar un error
+	var error bool = false
+
+	for i := 1; i < len(arCommand); i++ {
+		var commandToExecute = strings.Split(arCommand[i], "->")
+		var aux string = strings.ToLower(commandToExecute[0])
+		switch aux {
+		case "-id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "&id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-pwd":
+			pwd = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "&pwd":
+			pwd = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-usr":
+			usr = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "&usr":
+			usr = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		}
+	}
+	if usr == "" || pwd == "" || id == "" {
+		error = true
+	}
+	//Verifica que no haya error
+	if !error {
+
+		EXECUTE.Login(usr, pwd, id)
+	} else {
+		fmt.Println("Error al ejecutar el comando login")
+	}
+}
+
+//===== LOGOUT
+
+func LogOutCommand() {
+	EXECUTE.LogOut()
+}
+
+//====== MKGRP
+
+func MKGroupCommand(arCommand []string) {
+	var name string = ""
+	var id string = ""
+
+	//Manejar un error
+	var error bool = false
+
+	for i := 1; i < len(arCommand); i++ {
+		var commandToExecute = strings.Split(arCommand[i], "->")
+		var aux string = strings.ToLower(commandToExecute[0])
+		switch aux {
+		case "-id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-name":
+			name = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		}
+	}
+	if name == "" || id == "" {
+		error = true
+	}
+	//Verifica que no haya error
+	if !error {
+		EXECUTE.CreateGroup(name, id)
+	} else {
+		fmt.Println("Error al ejecutar el comando MKGRP")
 	}
 }
