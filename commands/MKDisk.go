@@ -16,9 +16,8 @@ import (
 
 //Método para escribir en un archivo
 func CreateFile(name string, path string, size int64) {
-
 	//Mando a crear el directorio
-	FUNCTION.CreateADirectory(path)
+	FUNCTION.CreateADirectory(path, 0777)
 	//Se crea el archivo
 	file, err := os.Create(path + name)
 	defer file.Close()

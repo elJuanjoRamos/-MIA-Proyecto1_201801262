@@ -1,6 +1,8 @@
 package controllers
 
-import STRUCTURES "../structures"
+import (
+	STRUCTURES "../structures"
+)
 
 //Variable global que almacenara al usiario logueado
 var UserLogued = STRUCTURES.USER{User_isLoged: false}
@@ -36,7 +38,7 @@ func IsLogged() bool {
 
 //Verifica si esta o no loguqo un ROOT logueado
 func IsRootLogged() bool {
-	if UserLogued.User_isLoged && (UserLogued.User_type == "root" || UserLogued.User_username == "root") {
+	if UserLogued.User_isLoged && (UserLogued.User_group == "root") {
 		return true
 	}
 	return false

@@ -60,6 +60,11 @@ func IfContains(str string, strContains string) bool {
 	return strings.ContainsAny(str, strContains)
 }
 
+func Contains(s string, substr string) bool {
+	return strings.Contains(s, substr)
+
+}
+
 //================FUNCIONES ESPECIALES
 
 //Verifica si existe una ruta
@@ -77,21 +82,19 @@ func IfExistDirectoryOrPath(path string) bool {
 func IfExistFile(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
-		fmt.Println("No existe el archivo solicitado")
 		return false
 	}
 	return !info.IsDir()
 }
 
 //Crea un directorio si no existe
-func CreateADirectory(path string) {
-
+func CreateADirectory(path string, number os.FileMode) {
 	//Revisa si existe o no el directorio
 	if !IfExistDirectoryOrPath(path) {
 		//Create a folder/directory at a full qualified path
-		err := os.Mkdir(path, 0755)
+		err := os.MkdirAll(path, number)
 		if err != nil {
-			fmt.Println("No se puede crear el directorio ", err)
+			fmt.Println(err)
 		} else {
 			fmt.Println("El directorio fue creado correctamente")
 		}
@@ -107,14 +110,7 @@ func CreateAFile(path string, text string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		l, err := file.WriteString(text)
-		if err != nil {
-			fmt.Println(err)
-			file.Close()
-			return
-		} else {
-			fmt.Println(l)
-		}
+		file.WriteString(text)
 	} else {
 		fmt.Println("El archivo ya existe")
 	}

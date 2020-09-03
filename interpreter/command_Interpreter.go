@@ -66,6 +66,18 @@ func GetCommand(commandEntry string) {
 		fmt.Println("--" + commandEntry)
 		MKGroupCommand(arCommand)
 		break
+	case "rmgrp":
+		fmt.Println("--" + commandEntry)
+		RMGroupCommand(arCommand)
+		break
+	case "mkusr":
+		fmt.Println("--" + commandEntry)
+		MKUsrCommand(arCommand)
+		break
+	case "mkdir":
+		fmt.Println("--" + commandEntry)
+		MKDirCommand(arCommand)
+		break
 	default:
 
 	}
@@ -463,5 +475,112 @@ func MKGroupCommand(arCommand []string) {
 		EXECUTE.CreateGroup(name, id)
 	} else {
 		fmt.Println("Error al ejecutar el comando MKGRP")
+	}
+}
+
+//===== RMGRP
+
+func RMGroupCommand(arCommand []string) {
+	var name string = ""
+	var id string = ""
+
+	//Manejar un error
+	var error bool = false
+
+	for i := 1; i < len(arCommand); i++ {
+		var commandToExecute = strings.Split(arCommand[i], "->")
+		var aux string = strings.ToLower(commandToExecute[0])
+		switch aux {
+		case "-id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-name":
+			name = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		}
+	}
+	if name == "" || id == "" {
+		error = true
+	}
+	//Verifica que no haya error
+	if !error {
+		EXECUTE.RemoveGroup(name, id)
+	} else {
+		fmt.Println("Error al ejecutar el comando MKGRP")
+	}
+}
+
+///==== MKUSR
+func MKUsrCommand(arCommand []string) {
+	var usr string = ""
+	var pwd string = ""
+	var id string = ""
+	var grp string = ""
+	//Manejar un error
+	var error bool = false
+
+	for i := 1; i < len(arCommand); i++ {
+		var commandToExecute = strings.Split(arCommand[i], "->")
+		var aux string = strings.ToLower(commandToExecute[0])
+		switch aux {
+		case "-id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-pwd":
+			pwd = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-usr":
+			usr = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-grp":
+			grp = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		}
+	}
+	if grp == "" || usr == "" || pwd == "" || id == "" {
+		error = true
+	}
+	//Verifica que no haya error
+	if !error {
+
+		EXECUTE.MakeAUser(usr, pwd, id, grp)
+	} else {
+		fmt.Println("Error al ejecutar el comando MKUSR")
+	}
+}
+
+//=== MKDIR
+
+func MKDirCommand(arCommand []string) {
+	var p string = ""
+	var path string = ""
+	var id string = ""
+	//Manejar un error
+	var error bool = false
+
+	for i := 1; i < len(arCommand); i++ {
+		var commandToExecute = strings.Split(arCommand[i], "->")
+		var aux string = strings.ToLower(commandToExecute[0])
+		switch aux {
+		case "-id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-path":
+			path = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-p":
+			p = "P"
+			break
+		}
+	}
+	if id == "" || path == "" {
+		error = true
+	}
+	//Verifica que no haya error
+	if !error {
+
+		EXECUTE.MakeADir(path, id, p)
+	} else {
+		fmt.Println("Error al ejecutar el comando MKUSR")
 	}
 }
