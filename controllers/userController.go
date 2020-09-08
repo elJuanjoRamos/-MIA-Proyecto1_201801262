@@ -9,6 +9,7 @@ var UserLogued = STRUCTURES.USER{User_isLoged: false}
 
 //Inserta el usuario en la estructura
 func AddLogedUser(id string, types string, group string, username string, password string) {
+
 	UserLogued = STRUCTURES.USER{
 		User_id:       id,
 		User_type:     types,

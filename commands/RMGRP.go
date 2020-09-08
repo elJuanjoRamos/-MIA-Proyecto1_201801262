@@ -1,19 +1,7 @@
 package commands
 
-import (
-	"bufio"
-	"fmt"
-	"log"
-	"os"
-	"strconv"
-	"strings"
-
-	CONTROLLER "../controllers"
-	FUNCTION "../functions"
-)
-
 func RemoveGroup(name string, id string) {
-	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+	/*if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
 		if CONTROLLER.IsRootLogged() { //VOY AL CONTROLADOR A VER SI HAY UN SUSIARIO LOGUEADO
 
 			var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
@@ -57,5 +45,5 @@ func RemoveGroup(name string, id string) {
 		}
 	} else {
 		fmt.Println("No hay particiones con el nombre " + id)
-	}
+	}*/
 }

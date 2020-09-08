@@ -1,14 +1,12 @@
 package commands
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	CONTROLLER "../controllers"
-	FUNCTION "../functions"
 )
 
 func MakeAUser(usr string, pwd string, id string, grp string) {
@@ -18,16 +16,52 @@ func MakeAUser(usr string, pwd string, id string, grp string) {
 			///VERIFICO SI LA PASS, EL USERNAME Y EL GRUPO TENGAN LA LONG TENGAN LA LONGITUD CORRECTA
 			if len(usr) <= 10 && len(pwd) <= 10 && len(grp) <= 10 {
 
-				var partition = GetPartitionById(id)                                 //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
-				var ifExist, idUser = VerifyGroupInFile(partition.Mount_usrtxt, grp) //Verifico si existe el grupo, ESTE METODO ESTA EN MKGRP.go
-				//Significa que no existe
-				if ifExist {
-					var str = strconv.Itoa(idUser) + ",U," + grp + "," + usr + "," + pwd + "\n"
-					var str2 = "," + usr + "," + pwd + "\n"
+				var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+				//SE ABRE EL ARCHIVO
+				file, err := os.OpenFile(partition.Mount_path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+				defer file.Close()
+				if err != nil {
+					fmt.Println("Hay un error, no se pudo abrir el disco duro")
+				}
+				//OBTENGO EL SUPER BOOT
+				var sb = GetSuperBoot(partition.Mount_part.Part_start, file) //GET SUPER BOOT SE ENCUENTRA FORMAT_FIRSTTIME.GO
+				var str = GetContentInINodes(file, sb.SB_ap_table_inode)
 
-					WriteNewUser(str, str2, partition.Mount_usrtxt, grp) //MANDO A ESCRIBIR AL USUARIO NUEVO,
+				var users []string = strings.Split(str, "\n")
+				var flagGrupo bool = false
+				var lstId int = 0
+				for i := 0; i < len(users)-1; i++ {
+					var userParts = strings.Split(strings.Trim(string(users[i]), " "), ",")
+					if strings.Trim(userParts[1], " ") == "G" && strings.Trim(userParts[2], " ") == grp { //Se hace un for solo en los usuarios
+						ar, er := strconv.Atoi(userParts[0]) //OBTENGO EL ID DEL GRUPO
+						lstId = ar
+						if er != nil {
+							fmt.Println(er)
+						}
+						flagGrupo = true
+						break
+					}
+				}
+
+				if flagGrupo { //SIGNIFICA QUE EL GRUPO YA ESTA CREADO
+					var contadorUsuarios = 0
+					for i := 0; i < len(users)-1; i++ {
+						var userParts = strings.Split(strings.Trim(string(users[i]), " "), ",")
+						if strings.Trim(userParts[1], " ") == "U" && strings.Trim(userParts[2], " ") == grp { //Verifica que el los usuarios ya esten creados
+							contadorUsuarios = contadorUsuarios + 1
+						}
+					}
+
+					var str = strconv.Itoa(lstId+contadorUsuarios) + ",U," + grp + "," + usr + "," + pwd + "\n"
+
+					var id, err = strconv.Atoi(CONTROLLER.GetLogedUser().User_id)
+					if err != nil {
+
+					}
+					CONTROLLER.BlockController_InsertText(sb, sb.SB_ap_table_inode, str, file, int64(id))
+
 				} else {
-					fmt.Println("El grupo no existe")
+					fmt.Println("El grupo " + grp + " no ha sido creado todavia.")
 				}
 
 			} else {
@@ -39,42 +73,5 @@ func MakeAUser(usr string, pwd string, id string, grp string) {
 		}
 	} else {
 		fmt.Println("No hay particiones con el nombre " + id)
-	}
-}
-
-//Verifica si existe el los usuarios en el archivo,
-
-func WriteNewUser(textIfNotExistGroup string, textIfExistGroup string, path string, grp string) {
-
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
-	defer file.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	scanner := bufio.NewScanner(file)
-	var text = ""
-	var bandera = false
-	for scanner.Scan() {
-		if FUNCTION.Contains(scanner.Text(), ",U,"+grp) { //Verifico que exista el grupo en las lineas
-			fmt.Println("entro")
-			bandera = true
-			text = text + scanner.Text() + textIfExistGroup + "\n"
-			break
-		} else {
-			text = text + scanner.Text() + "\n"
-		}
-	}
-
-	if !bandera {
-		file.WriteString(textIfNotExistGroup)
-	} else {
-		//SE BORRA EL ARCHIVO
-		e := os.Remove(path)
-		if e != nil {
-			log.Fatal(e)
-		}
-
-		FUNCTION.CreateAFile(path, text)
 	}
 }

@@ -5,6 +5,15 @@ package structures
 
  */
 
+type FREESPACE struct {
+	Disk_size  int64
+	P1_size    int64
+	P2_size    int64
+	P3_size    int64
+	P4_size    int64
+	Free_space int64
+}
+
 type MBR struct {
 	Mbr_size           int64
 	Mbr_creation_date  [19]byte
@@ -102,12 +111,13 @@ type SUPERBOOT struct {
 	SB_first_free_bit_table_dir  int64
 	SB_first_free_bit_block      int64
 	SB_magic_num                 int64
+	SB_free_space                int64
 }
 
 type ARBOLVIRTUALDIR struct {
-	Avd_fecha_creacion              [20]byte
+	Avd_fecha_creacion              [19]byte
 	Avd_nombre_directorio           [20]byte
-	Avd_ap_array_subdirectorios     []int64
+	Avd_ap_array_subdirectorios     [6]int64
 	Avd_ap_detalle_directorio       int64
 	Avd_ap_arbol_virtual_directorio int64
 	Avd_proper                      [20]byte
@@ -120,7 +130,37 @@ type FILE struct {
 	DD_file_date_modificacion [20]byte
 }
 type DIRECTORYDETAIL struct {
-	DD_array_files           [5]FILE
+	//DD_array_files [5]FILE
+	DD_file_nombre            [20]byte
+	DD_file_ap_inodo          int64
+	DD_file_date_creacion     [19]byte
+	DD_file_date_modificacion [19]byte
+	DD_file_lleno             bool
+
+	DD_file_nombre2            [20]byte
+	DD_file_ap_inodo2          int64
+	DD_file_date_creacion2     [19]byte
+	DD_file_date_modificacion2 [19]byte
+	DD_file_lleno2             bool
+
+	DD_file_nombre3            [20]byte
+	DD_file_ap_inodo3          int64
+	DD_file_date_creacion3     [19]byte
+	DD_file_date_modificacion3 [19]byte
+	DD_file_lleno3             bool
+
+	DD_file_nombre4            [20]byte
+	DD_file_ap_inodo4          int64
+	DD_file_date_creacion4     [19]byte
+	DD_file_date_modificacion4 [19]byte
+	DD_file_lleno4             bool
+
+	DD_file_nombre5            [20]byte
+	DD_file_ap_inodo5          int64
+	DD_file_date_creacion5     [19]byte
+	DD_file_date_modificacion5 [19]byte
+	DD_file_lleno5             bool
+
 	DD_ap_detalle_directorio int64
 }
 
@@ -128,13 +168,13 @@ type TABLEINODE struct {
 	I_count_inodo             int64
 	I_size_archivo            int64
 	I_count_bloques_asignados int64
-	I_array_bloques           []int64
+	I_array_bloques           [4]int64
 	I_ap_indirecto            int64
 	I_id_proper               int64
 }
 
 type DATABLOCK struct {
-	DB_data [50]byte
+	DB_data [25]byte
 }
 
 type LOG struct {

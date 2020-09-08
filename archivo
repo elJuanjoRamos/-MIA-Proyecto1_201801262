@@ -12,8 +12,8 @@ esto es un texto
 */
 
 //201801262
-Mkdisk -size->10 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Hoja1_201801262.dsk -uniT->k
-Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part1
+Mkdisk -size->150 -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Hoja1_201801262.dsk -uniT->k
+Fdisk -sizE->50 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part1
 Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part2
 Fdisk -sizE->5 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->E -name->Part3
 Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part4
@@ -25,22 +25,39 @@ mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS
 pause
 //mount
 //pause
-mkfs -id->vda1 -type->fast
+mkfs -id->vda1 -type->full
 //mkfs -id->vdb1 -type->full
 pause
-//mkfs -id->vda1 -type->full
-//pause
-login &usr->root1 &pwd->123 &id->vda1
+
+
+login -usr->root -pwd->201801262 -id->vda1
+
+
 pause
-//mkgrp -id->vda1 -name->"usuarios"
-//pause
-//rmgrp -id->vda1 -name->"usuarios"
+mkgrp -id->vda1 -name->"usuarios"
+
+pause
+mkgrp -id->vda1 -name->"usuarios1"
+
+pause
+mkgrp -id->vda1 -name->"usuarios2"
+
+pause
+mkgrp -id->vda1 -name->"usuarios3"
+
 pause
 //Mkusr -id->vda1 -usr->"user1" -grp->usuarios -pwd->usuario
+//pause
+//Mkusr -id->vda1 -usr->"juanramos" -grp->usuarios -pwd->usuario
+//pause
+//Mkusr -id->vda1 -usr->"nelly" -grp->usuarios -pwd->usrnelly
+//pause
+//rmgrp -id->vda1 -name->"usuarios"
+//pause
 //pause
 //Mkusr -id->vda1 -usr->"user1" -grp->usuarios -pwd->usuario
 //Mkusr -id->vda1 -usr->"user2" -grp->usuarios -pwd->456
-Mkdir -P -id->vda1 -path->"/home/eljuanjoramos/user1/docs/usac"
+//Mkdir -P -id->vda1 -path->"/home/user1/docs/usac"
 ////spew.Dump(m.Mbr_partition_1)
 //go get -u github.com/davecgh/go-spew/spew
 	

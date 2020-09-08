@@ -33,8 +33,6 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 			//Obtenemos el tamanio del mbr
 			var mbrSize int = int(unsafe.Sizeof(m))
 
-			//variable que va contar el espacio libre
-
 			//Lee la cantidad de <size> bytes del archivo
 			data := leerBytes(file, mbrSize)
 			//Convierte la data en un buffer,necesario para

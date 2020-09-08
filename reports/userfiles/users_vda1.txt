@@ -1,2 +1,2 @@
 1,G,root
-1,U,root,root,201801262,root1,123
+1,U,root,root,201801262
