@@ -557,10 +557,10 @@ func MKUsrCommand(arCommand []string) {
 
 //===== CHMOD
 func ChmodCommand(arCommand []string) {
-	var usr string = ""
-	var pwd string = ""
+	/*var ugo string = ""
+	var path string = ""
 	var id string = ""
-	var grp string = ""
+	var r string = ""
 	//Manejar un error
 	var error bool = false
 
@@ -571,27 +571,27 @@ func ChmodCommand(arCommand []string) {
 		case "-id":
 			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			break
-		case "-pwd":
-			pwd = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+		case "-path":
+			path = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			break
-		case "-usr":
-			usr = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+		case "-ugo":
+			ugo = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			break
-		case "-grp":
-			grp = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+		case "-R":
+			r = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			break
 		}
 	}
-	if grp == "" || usr == "" || pwd == "" || id == "" {
+	if ugo == "" || id == "" || path == "" {
 		error = true
 	}
 	//Verifica que no haya error
 	if !error {
 
-		EXECUTE.MakeAUser(usr, pwd, id, grp)
+		//EXECUTE.MakeAUser(ugo, path, id)
 	} else {
 		fmt.Println("Error al ejecutar el comando MKUSR")
-	}
+	}*/
 }
 
 //=== MKDIR

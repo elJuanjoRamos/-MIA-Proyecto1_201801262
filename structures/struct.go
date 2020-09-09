@@ -123,40 +123,39 @@ type ARBOLVIRTUALDIR struct {
 	Avd_proper                      [20]byte
 }
 
-type FILE struct {
-	DD_file_nombre            [20]byte
-	DD_file_ap_inodo          int64
-	DD_file_date_creacion     [20]byte
-	DD_file_date_modificacion [20]byte
-}
 type DIRECTORYDETAIL struct {
 	//DD_array_files [5]FILE
 	DD_file_nombre            [20]byte
 	DD_file_ap_inodo          int64
+	DD_file_permiso           int64
 	DD_file_date_creacion     [19]byte
 	DD_file_date_modificacion [19]byte
 	DD_file_lleno             bool
 
 	DD_file_nombre2            [20]byte
 	DD_file_ap_inodo2          int64
+	DD_file_permiso2           int64
 	DD_file_date_creacion2     [19]byte
 	DD_file_date_modificacion2 [19]byte
 	DD_file_lleno2             bool
 
 	DD_file_nombre3            [20]byte
 	DD_file_ap_inodo3          int64
+	DD_file_permiso3           int64
 	DD_file_date_creacion3     [19]byte
 	DD_file_date_modificacion3 [19]byte
 	DD_file_lleno3             bool
 
 	DD_file_nombre4            [20]byte
 	DD_file_ap_inodo4          int64
+	DD_file_permiso4           int64
 	DD_file_date_creacion4     [19]byte
 	DD_file_date_modificacion4 [19]byte
 	DD_file_lleno4             bool
 
 	DD_file_nombre5            [20]byte
 	DD_file_ap_inodo5          int64
+	DD_file_permiso5           int64
 	DD_file_date_creacion5     [19]byte
 	DD_file_date_modificacion5 [19]byte
 	DD_file_lleno5             bool

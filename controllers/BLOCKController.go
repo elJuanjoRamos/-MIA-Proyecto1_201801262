@@ -3,7 +3,6 @@ package controllers
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"log"
 	"os"
 	"unsafe"
@@ -31,7 +30,6 @@ func BlockController_InsertText(sb STRUCTURES.SUPERBOOT, inicioInodo int64, text
 				var str = GetStringInBlock(bloq.DB_data) //OBTENGO EL TEXTO DENTRO DEL BLOQUE
 				if len(str) < 25 {                       //SI LA LONFITUD DEL BLOQUE ES MENOR A 25, SIGNIFICA QUE TODAVIA LE CABEN CARACTERES
 					var cantidadCaracteres int = 25 - len(str)
-					fmt.Println(cantidadCaracteres)
 					if len(texto) != 0 {
 
 						if cantidadCaracteres <= len(texto) {
@@ -86,7 +84,6 @@ func BlockController_InsertText(sb STRUCTURES.SUPERBOOT, inicioInodo int64, text
 
 		if len(texto) > 0 { //SI ENTRA AQUI, SIGNIFICA QUE ENTRO AL PRIMER IF, ES DECIR, ENCONTRO ESPACIOS LIRBRES
 			//DENTRO DE LOS BLOQUES, PERO TODAVIA SOBRO TEXTO QUE INSERTAR, ENTONCES ES NECESARIO CREAR BLOQUES INDIRECTOS
-			fmt.Println(texto)
 			if m.I_ap_indirecto == -1 { //SI NO TIENE UN APUNTADOR, LO CREA, SI YA TIENE UNO, LO MANDA
 				m.I_ap_indirecto = INODOCONTROLLER_CreateINODO(sb, file, m.I_size_archivo, idUsuario)
 				//METODO RECURSIVO PARA METER TEXTO DENTRO DEL INODO INDIRECTO

@@ -41,13 +41,19 @@ func MakeADirFirsTime(path string, id string) {
 
 			//CREAMOS EL ARBOL DE DIRECTORIO INICIAL "/"
 			var tree = STRUCTURES.ARBOLVIRTUALDIR{
-				Avd_ap_detalle_directorio: sb.SB_ap_detail_dir,
+				Avd_ap_detalle_directorio:       sb.SB_ap_detail_dir,
+				Avd_ap_arbol_virtual_directorio: -1,
 			}
 			var time = time.Now()
 			copy(tree.Avd_fecha_creacion[:], time.Format("2006-01-02 15:04:05"))
 			copy(tree.Avd_nombre_directorio[:], CorregirName(path))
 			copy(tree.Avd_proper[:], CorregirName("root"))
-
+			tree.Avd_ap_array_subdirectorios[0] = -1
+			tree.Avd_ap_array_subdirectorios[1] = -1
+			tree.Avd_ap_array_subdirectorios[2] = -1
+			tree.Avd_ap_array_subdirectorios[3] = -1
+			tree.Avd_ap_array_subdirectorios[4] = -1
+			tree.Avd_ap_array_subdirectorios[5] = -1
 			//ESCRIBIMOS EL ARBOL AL INICIO
 			tree1 := &tree
 			var binario4 bytes.Buffer

@@ -128,7 +128,3 @@ func MakeAFileInLogicalDiskFirstTime(path string, id string, p string, size int6
 		fmt.Println("No existe una particion con el id " + id)
 	}
 }
-
-func evaluar() {
-
-}
