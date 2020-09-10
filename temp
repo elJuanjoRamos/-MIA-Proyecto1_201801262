@@ -1,0 +1,34 @@
+//Fdisk -sizE->50 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part1
+//Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part2
+//Fdisk -sizE->5 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->E -name->Part3
+//Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part4
+//pause
+//readdisk -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk"
+//pause
+//mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part1 
+//mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part4 
+//pause
+//mount
+//pause
+//mkfs -id->vda1 -type->full
+//mkfs -id->vdb1 -type->full
+//pause
+
+
+//login -usr->root -pwd->201801262 -id->vda1
+
+
+//pause
+//mkgrp -id->vda1 -name->"usuarios"
+
+//pause
+//Mkusr -id->vda1 -usr->"user1" -grp->usuarios -pwd->usuario
+
+//pause
+//Mkdir -P -id->vda1 -path->"/home/user/usac"
+//pause
+//Mkdir -id->vda1 -path->"/home/user/usac/user2"
+
+////spew.Dump(m.Mbr_partition_1)
+//go get -u github.com/davecgh/go-spew/spew
+	

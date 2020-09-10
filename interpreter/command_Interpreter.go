@@ -15,11 +15,12 @@ import (
 // This func must be Exported, Capitalized, and comment added.
 
 func GetCommand(commandEntry string) {
+
 	var arCommand []string = strings.Split(FUNCTION.RemoveSpaces(commandEntry), " ")
 
 	var command = strings.ToLower(arCommand[0])
 
-	switch command {
+	switch strings.TrimRight(command, "\n") {
 	case "exec":
 		ExecCommand(arCommand[1])
 		break
@@ -88,7 +89,12 @@ func GetCommand(commandEntry string) {
 		break
 
 	default:
-
+		if !strings.Contains(command, "#") {
+			fmt.Println("╔══════════════════════════════════════════════════╗")
+			fmt.Println("  COMANDO NO SOPORTADO")
+			fmt.Println("╚══════════════════════════════════════════════════╝")
+		}
+		break
 	}
 }
 
@@ -127,24 +133,30 @@ func ExecCommand(arCommand string) {
 
 	//var tieneSalto = false
 	//var anteriorTenia = true
-
+	var comando string = ""
 	for fileScanner.Scan() {
-		/*var contiene bool = strings.ContainsAny(fileScanner.Text(), "\*");
-		if  contiene {
-			fileTextLines = append(fileTextLines, fileScanner.Text())
 
-		} else {
+		commandTem := fileScanner.Text()
+		if commandTem != "" {
+			if strings.Contains(commandTem, "\\*") {
+				remCaracter := strings.Replace(commandTem, "\\*", "", 1)
 
-		}*/
-
-		GetCommand(fileScanner.Text())
-
+				comando += strings.TrimRight(remCaracter, "\n")
+			} else {
+				if comando != "" {
+					comandoTrim := strings.TrimRight(commandTem, "\n")
+					comando += comandoTrim
+					GetCommand(comando)
+					comando = ""
+				} else {
+					comando := strings.TrimRight(commandTem, "\n")
+					GetCommand(comando)
+				}
+			}
+		}
 	}
 
 	readFile.Close()
-	/*for _, eachline := range fileTextLines {
-		fmt.Println(eachline)
-	}*/
 
 }
 

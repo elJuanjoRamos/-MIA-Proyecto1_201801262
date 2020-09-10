@@ -1,8 +1,10 @@
 package reports
 
 import (
+	"bytes"
 	"fmt"
-	"os"
+	"log"
+	"os/exec"
 	"strconv"
 
 	CONTROLLER "../functions"
@@ -13,10 +15,10 @@ import (
 var rootDir = CONTROLLER.RootDir()
 
 func CreateMBRReport(mbr STRUCTURES.MBR) {
-	//Se crea los directorios que almacenara los dots
-	CONTROLLER.CreateADirectory(rootDir + "/reports/dots")
+	/*//Se crea los directorios que almacenara los dots
+	CONTROLLER.CreateADirectory(rootDir+"/reports/dots", 777)
 	//Se crea los directorios que almacenara las imagenes
-	CONTROLLER.CreateADirectory(rootDir + "/reports/pngs")
+	CONTROLLER.CreateADirectory(rootDir+"/reports/pngs", 777)
 
 	var body string = "digraph test { graph [ratio=fill];" +
 		"node [label=\"Grafica\", fontsize=15, shape=plaintext];" +
@@ -40,15 +42,17 @@ func CreateMBRReport(mbr STRUCTURES.MBR) {
 		fmt.Println(err)
 		return
 	}
-	f.WriteString(body)
+	f.WriteString(body)*/
 
-	app := "dot"
+	/*app := "dot"
 	arg0 := "-Tpng"
 	arg1 := "\"" + rootDir + "/reports/dots/mbr.dot" + "\""
 	arg2 := "-o"
 	arg3 := "\"" + rootDir + "/reports/pngs/mbr.png" + "\""
 
-	fmt.Println(app + " " + arg0 + " " + arg1 + " " + arg2 + " " + arg3)
+		cmd = exec.Command(app, arg0, arg1, arg2, arg3)
+
+	*/
 	/*cmd := exec.Command(app, arg0, arg1, arg2, arg3)
 	stdout, err := cmd.Output()
 
@@ -58,7 +62,14 @@ func CreateMBRReport(mbr STRUCTURES.MBR) {
 	}
 
 	fmt.Println(string(stdout))*/
-
+	err, out, errout := Shellout("ls -ltr")
+	if err != nil {
+		log.Printf("error: %v\n", err)
+	}
+	fmt.Println("--- stdout ---")
+	fmt.Println(out)
+	fmt.Println("--- stderr ---")
+	fmt.Println(errout)
 }
 
 func verifyPartition(partition STRUCTURES.PARTITION, body string, size int) string {
@@ -79,4 +90,16 @@ func verifyPartition(partition STRUCTURES.PARTITION, body string, size int) stri
 		"<TR>" + "<TD>Part_size</TD>" + "<TD>" + strconv.Itoa(int(partition.Part_size)) + "</TD>" + "</TR>"
 
 	return body
+}
+
+const ShellToUse = "bash"
+
+func Shellout(command string) (error, string, string) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd := exec.Command(ShellToUse, "-c", command)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	return err, stdout.String(), stderr.String()
 }
