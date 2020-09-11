@@ -123,11 +123,11 @@ func IfExistFile(path string) bool {
 }
 
 //Crea un directorio si no existe
-func CreateADirectory(path string, number os.FileMode) {
+func CreateADirectory(path string) {
 	//Revisa si existe o no el directorio
 	if !IfExistDirectoryOrPath(path) {
 		//Create a folder/directory at a full qualified path
-		err := os.MkdirAll(path, number)
+		err := os.MkdirAll(path, 0777)
 		if err != nil {
 			fmt.Println(err)
 		} else {

@@ -1,2 +1,3 @@
 Mkdisk -size->150 \* 
--path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Hoja1_201801262.dsk -uniT->k
+-path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Hoja1_201801262.dsk -uniT->k
+pause

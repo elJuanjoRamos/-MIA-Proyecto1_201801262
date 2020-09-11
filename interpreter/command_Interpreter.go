@@ -22,7 +22,7 @@ func GetCommand(commandEntry string) {
 
 	switch strings.TrimRight(command, "\n") {
 	case "exec":
-		ExecCommand(arCommand[1])
+		ExecCommand(arCommand)
 		break
 	case "pause":
 		Pause()
@@ -33,7 +33,7 @@ func GetCommand(commandEntry string) {
 		break
 	case "rmdisk":
 		fmt.Println("--" + commandEntry)
-		RMDiskCommand(arCommand[1])
+		RMDiskCommand(arCommand)
 		break
 	case "fdisk":
 		fmt.Println("--" + commandEntry)
@@ -109,54 +109,59 @@ func ReadDiskCommand(arCommand string) {
 
 //=========================EXEC COMMAND
 
-func ExecCommand(arCommand string) {
+func ExecCommand(arCommand []string) {
+	for i := 1; i < len(arCommand); i++ {
 
-	var commandToExecute []string
-	commandToExecute = strings.Split(arCommand, "->")
+		if arCommand[i] != "" {
+			var commandToExecute []string
+			commandToExecute = strings.Split(arCommand[i], "->")
 
-	var fpath string = commandToExecute[1]
+			var fpath string = commandToExecute[1]
 
-	readFile, err := os.Open(FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(fpath)))
+			readFile, err := os.Open(FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(fpath)))
 
-	if err != nil {
-		log.Fatalf("failed to open file: %s", err)
-	}
+			if err != nil {
+				log.Fatalf("failed to open file: %s", err)
+			}
 
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
+			fileScanner := bufio.NewScanner(readFile)
+			fileScanner.Split(bufio.ScanLines)
 
-	//var fileTextLines []string
-	fmt.Println("==================================")
-	fmt.Println("	COMMAND LIST		   ")
-	fmt.Println("   list of running commands   ")
-	fmt.Println("==================================")
+			//var fileTextLines []string
+			fmt.Println("==================================")
+			fmt.Println("	COMMAND LIST		   ")
+			fmt.Println("   list of running commands   ")
+			fmt.Println("==================================")
 
-	//var tieneSalto = false
-	//var anteriorTenia = true
-	var comando string = ""
-	for fileScanner.Scan() {
+			//var tieneSalto = false
+			//var anteriorTenia = true
+			var comando string = ""
+			for fileScanner.Scan() {
 
-		commandTem := fileScanner.Text()
-		if commandTem != "" {
-			if strings.Contains(commandTem, "\\*") {
-				remCaracter := strings.Replace(commandTem, "\\*", "", 1)
+				commandTem := fileScanner.Text()
+				if commandTem != "" {
+					if strings.Contains(commandTem, "\\*") {
+						remCaracter := strings.Replace(commandTem, "\\*", "", 1)
 
-				comando += strings.TrimRight(remCaracter, "\n")
-			} else {
-				if comando != "" {
-					comandoTrim := strings.TrimRight(commandTem, "\n")
-					comando += comandoTrim
-					GetCommand(comando)
-					comando = ""
-				} else {
-					comando := strings.TrimRight(commandTem, "\n")
-					GetCommand(comando)
+						comando += strings.TrimRight(remCaracter, "\n")
+					} else {
+						if comando != "" {
+							comandoTrim := strings.TrimRight(commandTem, "\n")
+							comando += comandoTrim
+							GetCommand(comando)
+							comando = ""
+						} else {
+							comando := strings.TrimRight(commandTem, "\n")
+							GetCommand(comando)
+						}
+					}
 				}
 			}
+
+			readFile.Close()
+			break
 		}
 	}
-
-	readFile.Close()
 
 }
 
@@ -234,11 +239,15 @@ func MKDiskCommand(arCommand []string) {
 
 //=====RMDISK COMMAND
 
-func RMDiskCommand(arCommand string) {
+func RMDiskCommand(arCommand []string) {
 
-	var commandToExecute []string = strings.Split(arCommand, "->")
-	var path string = FUNCTION.ReplaceAll(commandToExecute[1])
-	EXECUTE.RemoveDisk(path)
+	for i := 1; i < len(arCommand); i++ {
+		if arCommand[i] != "" {
+			var commandToExecute []string = strings.Split(arCommand[i], "->")
+			var path string = FUNCTION.ReplaceAll(FUNCTION.ReplaceAll(FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))))
+			EXECUTE.RemoveDisk(path)
+		}
+	}
 }
 
 //=======FDISK COMMAND

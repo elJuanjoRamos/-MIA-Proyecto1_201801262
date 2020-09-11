@@ -15,12 +15,22 @@ func RemoveDisk(path string) {
 	var str = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(path))
 
 	if _, err := os.Stat(str); os.IsNotExist(err) {
-		fmt.Println("The file or directory does not exist")
+
+		fmt.Println("=====================================================")
+		fmt.Println("	The file or directory does not exist")
+		fmt.Println("=====================================================")
+		fmt.Println("")
+
 	} else {
 		//Obtengo el nombre del disco
 		var arCommand []string = strings.Split(str, "/")
-		fmt.Println("Are you sure you want to delete " + arCommand[len(arCommand)-1] + "?")
+
+		fmt.Println("=====================================================")
+		fmt.Println("  Are you sure you want to delete " + arCommand[len(arCommand)-1] + "?")
+		fmt.Println("=====================================================")
+		fmt.Println("")
 		fmt.Print("Press Y/N: ")
+
 		reader := bufio.NewReader(os.Stdin)
 		comando, _ := reader.ReadString('\n')
 		input := ""

@@ -17,7 +17,7 @@ func main() {
 //FUNCION INTERPRETE
 func interpret() {
 
-	comando1 := "exec -path->\"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/archivo\""
+	comando1 := "exec -path->\"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/archivo\""
 	INTERPRETE.GetCommand(comando1)
 	/*finalizar := 0
 	inicio := "╔══════════════════════════════════════════════════╗\n"
