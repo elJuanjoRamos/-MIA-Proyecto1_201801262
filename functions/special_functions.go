@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-
-	STRUCTURES "../structures"
 )
 
 //Reemplaza los * de las path por espacios
@@ -68,39 +66,6 @@ func Contains(s string, substr string) bool {
 }
 
 //================FUNCIONES ESPECIALES
-
-//Funcion que verifica la cantidad des espacio libre
-
-var disk = STRUCTURES.FREESPACE{}
-
-func SpaceFree(size int64, tipe int) {
-	switch tipe {
-	case 0: //Significa que viene el disco
-		disk.Disk_size = size
-		disk.Free_space = size
-		break
-	case 1: //Particion 1
-		disk.P1_size = size
-		disk.Free_space = disk.Disk_size - size
-		break
-	case 2: //Particion 2
-		disk.P2_size = size
-		disk.Free_space = disk.Disk_size - disk.P1_size - size
-		break
-	case 3: //Particion 3
-		disk.P3_size = size
-		disk.Free_space = disk.Disk_size - disk.P1_size - disk.P2_size - size
-		break
-	case 4: //Particion 4
-		disk.P4_size = size
-		disk.Free_space = disk.Disk_size - disk.P1_size - disk.P2_size - disk.P3_size - size
-		break
-
-	}
-}
-func GetFreeSpace() int64 {
-	return disk.Free_space
-}
 
 //Verifica si existe una ruta
 

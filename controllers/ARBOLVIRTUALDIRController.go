@@ -115,6 +115,7 @@ func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPE
 	//PATH -> LA PATH QUE VOY A BUSCAR
 	//DIR -> LA CARPETA QUE VOY A CREAR
 
+	//home / hola
 	//OBTENGO EL ARBOL
 	var arbol = GetArbolVirual(inicioArbol, file)
 
@@ -123,17 +124,6 @@ func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPE
 		//PARTO EL PATH QUE VIENE
 		var pathlist []string = strings.Split(path, "/")
 		var banderaBuscado = false
-
-		//BUCAR EL PATH EN EL ARBOL
-		//OSEA
-		/*
-			 path = 'root'/home/user/
-
-			 root apunta a
-				 -home
-				 	- user
-
-		*/
 
 		var stringTemporal = ""
 

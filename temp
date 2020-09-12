@@ -1,12 +1,6 @@
-//Fdisk -sizE->50 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part1
-//Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part2
-//Fdisk -sizE->5 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->E -name->Part3
-//Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part4
 //pause
 //readdisk -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk"
 //pause
-//mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part1 
-//mount -path->"/home/eljuanjoramos/Documentos/MANEJO E IMPLEMENTACION DE ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part4 
 //pause
 //mount
 //pause
@@ -32,3 +26,11 @@
 ////spew.Dump(m.Mbr_partition_1)
 //go get -u github.com/davecgh/go-spew/spew
 	
+
+ARCHIVOS modificados
+
+struct controller //agregue metodos para eliminar particiones
+mkdisk
+fdisk // agregue metodos para eliminar particiones
+reportes
+mount_umount // validacion de que no se monte otra vez

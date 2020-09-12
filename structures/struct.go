@@ -16,6 +16,7 @@ type FREESPACE struct {
 
 type MBR struct {
 	Mbr_size           int64
+	Mbr_disk           int64
 	Mbr_creation_date  [19]byte
 	Mbr_disk_signature int64
 	Mbr_count          int8
@@ -65,7 +66,6 @@ type MOUNT struct {
 	Mount_id        string
 	Mount_path      string
 	Mount_particion string
-	Mount_usrtxt    string
 	Mount_estado    bool
 	Mount_part      PARTITION
 }

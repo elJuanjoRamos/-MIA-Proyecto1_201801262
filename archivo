@@ -1,3 +1,36 @@
 Mkdisk -size->150 \* 
 -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/" -name->Hoja1_201801262.dsk -uniT->k
 pause
+
+Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part1
+pause
+Fdisk -sizE->30 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->E -name->Part2
+pause
+Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part3
+pause
+Fdisk -sizE->1 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->P -name->Part4
+pause
+Fdisk -sizE->2 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->L -name->PrimeraLogica1
+pause
+Fdisk -sizE->2 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -Type->L -name->SegundaLogica1
+pause
+mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part1 
+pause
+mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part4 
+pause
+mount
+pause
+unmount -id1->vda1
+pause
+mount
+pause
+mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part1 
+pause
+mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part3 
+pause
+mount
+pause
+unmount -id1->vda1 -id1->vda5 -id1->vdb1
+pause
+mount
+

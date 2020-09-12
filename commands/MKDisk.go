@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"time"
+	"unsafe"
 
 	CONTROLLER "../controllers"
 	FUNCTION "../functions"
@@ -46,7 +47,7 @@ func CreateFile(name string, path string, size int64) {
 
 }
 
-func WriteFile(path string) {
+func WriteFile(path string, name string) {
 
 	//Abrimos el archivo
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
@@ -62,8 +63,9 @@ func WriteFile(path string) {
 	var random int64 = rand.Int63()
 	var time = time.Now()
 
+	var mbrSize = int64(unsafe.Sizeof(STRUCTURES.MBR{}))
 	//Asignamos valores a los atributos del struct.
-	disco := STRUCTURES.MBR{Mbr_disk_signature: random, Mbr_count: 4, Mbr_size: FUNCTION.FileSize(path)}
+	disco := STRUCTURES.MBR{Mbr_disk_signature: random, Mbr_count: 3, Mbr_disk: FUNCTION.FileSize(path), Mbr_size: mbrSize}
 	copy(disco.Mbr_creation_date[:], time.Format("2006-01-02 15:04:05"))
 
 	//Escribimos struct.
@@ -73,6 +75,8 @@ func WriteFile(path string) {
 	escribirBytes(file, binario3.Bytes())
 
 	REPORTS.CreateMBRReport(disco)
+
+	REPORTS.CreateDiskReport(disco, name)
 }
 
 //Método para escribir en un archivo.

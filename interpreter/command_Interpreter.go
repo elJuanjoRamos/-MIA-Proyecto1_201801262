@@ -45,7 +45,7 @@ func GetCommand(commandEntry string) {
 		break
 	case "unmount":
 		fmt.Println("--" + commandEntry)
-		fmt.Println("six")
+		UNMOUNTCommand(arCommand)
 		break
 	case "readdisk":
 		fmt.Println("--" + commandEntry)
@@ -230,11 +230,12 @@ func MKDiskCommand(arCommand []string) {
 			unit = 1024 * 1024
 		}
 		EXECUTE.CreateFile(name, path, unit*size)
-		EXECUTE.WriteFile(path + name)
+		EXECUTE.WriteFile(path+name, name)
 
 		//EXECUTE.CreateReport()
+	} else {
+		fmt.Println("Ha ocurrido un error al intentar ejecutar el comando MKDisk")
 	}
-
 }
 
 //=====RMDISK COMMAND
@@ -259,7 +260,7 @@ func FDiskCommand(arCommand []string) {
 	var name string
 	var types string = "P"
 	var fit string = "WF"
-	//var deletes string
+	var deletes string = ""
 	//var adds string
 	var error bool = false
 
@@ -295,7 +296,7 @@ func FDiskCommand(arCommand []string) {
 				error = true
 			}
 		case "-name":
-			name = FUNCTION.ReplaceAll(commandToExecute[1])
+			name = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 		case "-type":
 			if strings.ToLower(commandToExecute[1]) == "p" || strings.ToLower(commandToExecute[1]) == "l" || strings.ToLower(commandToExecute[1]) == "e" {
 				types = commandToExecute[1]
@@ -311,7 +312,7 @@ func FDiskCommand(arCommand []string) {
 				fmt.Println("No se reconoce el ajuste de particion a crear")
 			}
 		case "-delete":
-			//deletes = commandToExecute[1]
+			deletes = commandToExecute[1]
 		case "-add":
 			//adds = commandToExecute[1]
 		}
@@ -323,13 +324,20 @@ func FDiskCommand(arCommand []string) {
 			unit = 1024
 		}
 
-		EXECUTE.FormatDisk(path, unit*size, name, types, fit)
+		if deletes != "" {
+			if strings.ToLower(deletes) == "fast" || strings.ToLower(deletes) == "full" {
+				EXECUTE.DeletePartition(path, name, deletes)
+			} else {
+				fmt.Println("El parametro establecido para delete no es valido")
+				fmt.Println("Error al ejecutar el comando FDISK")
+			}
+		} else {
+			EXECUTE.FormatDisk(path, unit*size, name, types, fit)
+		}
 
+	} else {
+		fmt.Println("Error al ejecutar el comando FDISK")
 	}
-
-	//fmt.Println("Delete: " + deletes)
-	//fmt.Println("Add: " + adds)
-
 }
 
 //=======MOUNT COMMAND
@@ -354,9 +362,35 @@ func MOUNTCommand(arCommand []string) {
 	}
 
 	if path != "null" && name != "null" {
-		EXECUTE.Mount(path, name)
+		if path != "" && name != "" {
+			EXECUTE.Mount(path, name)
+		} else {
+			fmt.Println("Ha ocurrido un error al intentar ejecutar el comando Mount")
+		}
 	} else {
 		EXECUTE.MountPrint()
+	}
+}
+
+//======== UMOUNT COMMAND
+func UNMOUNTCommand(arCommand []string) {
+	var ids []string
+
+	if len(arCommand) > 1 {
+		for i := 1; i < len(arCommand); i++ {
+
+			var commandToExecute = strings.Split(arCommand[i], "->")
+			var aux string = strings.ToLower(commandToExecute[0])
+			if strings.Contains(aux, "-id") {
+				ids = append(ids, FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1])))
+			}
+		}
+	}
+
+	if len(ids) > 0 {
+		EXECUTE.UMount(ids)
+	} else {
+		fmt.Println("Error al intentar ejecutar el comando unmount")
 	}
 }
 
@@ -703,4 +737,8 @@ func MKFileCommand(arCommand []string) {
 	} else {
 		fmt.Println("Error al ejecutar el comando MKUSR")
 	}
+}
+
+func RepCommand(arCommand []string) {
+
 }

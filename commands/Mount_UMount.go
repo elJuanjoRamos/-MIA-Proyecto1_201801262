@@ -18,11 +18,27 @@ import (
 var MountList [100][26]STRUCTURES.MOUNT
 
 func MountPrint() {
+
+	fmt.Println("")
+	fmt.Println("=====================================")
+	fmt.Println("> Listado de Particiones montadas")
+	fmt.Println("=====================================")
+	fmt.Println("")
+
 	for i := 0; i < 100; i++ {
 		for j := 0; j < 26; j++ {
 			if (MountList[i][j] != STRUCTURES.MOUNT{}) {
-				fmt.Println(MountList[i][j])
-				fmt.Println("")
+				var mount = MountList[i][j]
+				fmt.Println("Partition ID: " + mount.Mount_id)
+				fmt.Println("Partition Path: " + mount.Mount_path)
+				fmt.Println("Partition Name: " + mount.Mount_particion)
+				fmt.Println("Partition State: ", mount.Mount_estado)
+				fmt.Println("Partition Size: ", mount.Mount_part.Part_size)
+				fmt.Println("Partition Type: ", mount.Mount_part.Part_type)
+				fmt.Println("Partition Fit: ", mount.Mount_part.Part_fit)
+				fmt.Println("Partition Start: ", mount.Mount_part.Part_start)
+				fmt.Println("-----------")
+
 			}
 		}
 		//fmt.Println("")
@@ -57,46 +73,51 @@ func Mount(path string, name string) {
 			log.Fatal("binary.Read failed", err)
 		}
 
-		//Se busca la particion con nombre especificado
-		if m.Mbr_count != 4 {
+		var PartitionArray = [4]STRUCTURES.PARTITION{}
+		PartitionArray[0] = m.Mbr_partition_1
+		PartitionArray[1] = m.Mbr_partition_2
+		PartitionArray[2] = m.Mbr_partition_3
+		PartitionArray[3] = m.Mbr_partition_4
 
-			//BUSCA SI ES UNA PARTICION PRIMARIA
-			if GetPartitionName(m.Mbr_partition_1.Part_name) == name &&
-				GetPartitionName([16]byte{m.Mbr_partition_1.Part_type}) == "P" {
-				InsertPart(m.Mbr_partition_1, path, name)
-				fmt.Println("Particion Montada correctamente")
-			} else if GetPartitionName(m.Mbr_partition_2.Part_name) == name &&
-				GetPartitionName([16]byte{m.Mbr_partition_2.Part_type}) == "P" {
-				InsertPart(m.Mbr_partition_2, path, name)
-				fmt.Println("Particion Montada correctamente")
-
-			} else if GetPartitionName(m.Mbr_partition_3.Part_name) == name &&
-				GetPartitionName([16]byte{m.Mbr_partition_1.Part_type}) == "P" {
-				InsertPart(m.Mbr_partition_3, path, name)
-				fmt.Println("Particion Montada correctamente")
-
-			} else if GetPartitionName(m.Mbr_partition_4.Part_name) == name {
-				InsertPart(m.Mbr_partition_4, path, name)
-				fmt.Println("Particion Montada correctamente")
-			} else {
-				filename := filepath.Base(path)
-				//No se encuentra se va a buscar a las logicas
-				var partExist = CONTROLLER.SearchPartition(filename, name)
-
-				if partExist {
-					InsertPart(CONTROLLER.GetLogicPartition(filename, name), path, name)
-					fmt.Println("Particion Montada correctamente")
-
-					//Si tampoco se encuentra en las logicas, se muestra un mensaje de error
-				} else {
-					fmt.Println("No existe la particion con nombre " + name + " en el disco " + filename)
+		var bandera = false
+		for i := 0; i < 4; i++ { //BUsco en las particiones primarias
+			var partition = PartitionArray[i]
+			if partition.Part_isEmpty == 1 {
+				if GetPartitionName(partition.Part_name) == name && string(partition.Part_type) == "P" {
+					InsertPart(partition, path, name)
+					bandera = true
+					break
 				}
 
 			}
-
-		} else {
-			fmt.Println("No existen particiones dentro del disco")
 		}
+		if !bandera { // si no esta en las primarias, la busco en las logicas
+			for i := 0; i < 4; i++ {
+				var partition = PartitionArray[i]
+				if partition.Part_isEmpty == 1 {
+					if string(partition.Part_type) == "E" {
+
+						filename := filepath.Base(path)
+						//No se encuentra se va a buscar a las logicas
+						var partExist = CONTROLLER.SearchPartition(filename, name)
+
+						if partExist {
+							InsertPart(CONTROLLER.GetLogicPartition(filename, name), path, name)
+							//Si tampoco se encuentra en las logicas, se muestra un mensaje de error
+						} else {
+							fmt.Println("")
+							fmt.Println("============================================================================")
+							fmt.Println("> No existe la particion con nombre " + name + " en el disco " + filename)
+							fmt.Println("============================================================================")
+							fmt.Println("")
+						}
+						break
+					}
+
+				}
+			}
+		}
+
 	} else {
 		fmt.Println("El disco o ruta no existe")
 	}
@@ -104,32 +125,77 @@ func Mount(path string, name string) {
 }
 
 func InsertPart(part STRUCTURES.PARTITION, path string, name string) {
+	var encontrado = false
 	for i := 0; i < 100; i++ {
 		for j := 0; j < 26; j++ {
-			if (MountList[i][j] == STRUCTURES.MOUNT{}) {
-				asciiNum := 97 + j // Uppercase A
-				character := string(asciiNum)
-				s := strconv.Itoa(i + 1)
-				MountList[i][j] = STRUCTURES.MOUNT{
-					Mount_id:        "vd" + character + s,
-					Mount_path:      path,
-					Mount_particion: name,
-					Mount_estado:    true,
-					Mount_part:      part,
+			if (MountList[i][j] != STRUCTURES.MOUNT{}) {
+				if MountList[i][j].Mount_particion == name {
+					encontrado = true
+					break
 				}
-				return
 			}
 		}
 	}
+
+	if encontrado {
+		fmt.Println("")
+		fmt.Println("============================================")
+		fmt.Println("> La particion " + name + " ya esta montada")
+		fmt.Println("============================================")
+		fmt.Println("")
+	} else {
+		for i := 0; i < 100; i++ {
+			for j := 0; j < 26; j++ {
+				if (MountList[i][j] == STRUCTURES.MOUNT{}) {
+					asciiNum := 97 + j // Uppercase A
+					character := string(asciiNum)
+					s := strconv.Itoa(i + 1)
+					MountList[i][j] = STRUCTURES.MOUNT{
+						Mount_id:        "vd" + character + s,
+						Mount_path:      path,
+						Mount_particion: name,
+						Mount_estado:    true,
+						Mount_part:      part,
+					}
+					fmt.Println("")
+					fmt.Println("=====================================")
+					fmt.Println("> Particion Montada correctamente")
+					fmt.Println("=====================================")
+					fmt.Println("")
+
+					return
+				}
+			}
+		}
+	}
+
 }
 
-func UMount(id string) {
-	for i := 0; i < 100; i++ {
-		for j := 0; j < 26; j++ {
-			if MountList[i][j].Mount_id == id {
-				MountList[i][j] = STRUCTURES.MOUNT{}
-				return
+func UMount(ids []string) {
+
+	for k := 0; k < len(ids); k++ {
+		var bandera = false
+		for i := 0; i < 100; i++ {
+			for j := 0; j < 26; j++ {
+				if MountList[i][j].Mount_id == ids[k] {
+					bandera = true
+					MountList[i][j] = STRUCTURES.MOUNT{}
+					break
+				}
 			}
+		}
+		if bandera {
+			fmt.Println("")
+			fmt.Println("==================================================")
+			fmt.Println("> Particion " + ids[k] + " desmontada correctamente")
+			fmt.Println("==================================================")
+			fmt.Println("")
+		} else {
+			fmt.Println("")
+			fmt.Println("==================================================")
+			fmt.Println("> Particion " + ids[k] + " no se encuentra montada")
+			fmt.Println("==================================================")
+			fmt.Println("")
 		}
 	}
 }
@@ -138,7 +204,11 @@ func GetPartitionName(name [16]byte) string {
 	var s string = ""
 	for _, v := range name {
 		if v != 0 {
-			s = s + string(v)
+			if string(v) == "+" {
+				break
+			} else {
+				s = s + string(v)
+			}
 		}
 	}
 	return s
@@ -166,16 +236,4 @@ func GetPartitionById(id string) STRUCTURES.MOUNT {
 		}
 	}
 	return STRUCTURES.MOUNT{}
-}
-
-//update user txt, le da la ruta del archivo txt de usuarios asignado a esa particion
-func UpdateUserTxt(id string, path string) {
-	for i := 0; i < 100; i++ {
-		for j := 0; j < 26; j++ {
-			if MountList[i][j].Mount_id == id {
-				MountList[i][j].Mount_usrtxt = path
-				break
-			}
-		}
-	}
 }
