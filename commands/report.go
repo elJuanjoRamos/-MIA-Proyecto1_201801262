@@ -1,4 +1,4 @@
-package reports
+package commands
 
 import (
 	"bytes"
@@ -6,12 +6,109 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 
 	CONTROLLER "../controllers"
 	FUNCTION "../functions"
 	STRUCTURES "../structures"
 )
+
+func MakeAReport(path, id, nombre, ruta string) {
+
+	switch nombre {
+	case "sb":
+		MakeASBReport(path, id, ruta)
+		break
+	case "condition":
+		break
+	case "f":
+		break
+	case "ff":
+		break
+	case "ffff":
+		break
+	case "fffff":
+		break
+	case "a":
+		break
+	}
+}
+
+func MakeASBReport(path, id, ruta string) { //REPORTE DEL SUPER BOOT
+	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+		var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+
+		//SE ABRE EL ARCHIVO
+		file, err := os.OpenFile(partition.Mount_path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+		defer file.Close()
+		if err != nil {
+			fmt.Println("Hay un error, no se pudo abrir el disco duro")
+		}
+		//OBTENGO EL SUPER BOOT
+		var sb = GetSuperBoot(partition.Mount_part.Part_start, file) //GET SUPER BOOT SE ENCUENTRA FORMAT_FIRSTTIME.GO
+
+		var s string
+		for _, v := range sb.SB_hd_name {
+			if v != 0 {
+				s = s + string(v)
+			}
+		}
+		var s1 string
+		for _, v := range sb.SB_date {
+			if v != 0 {
+				s = s + string(v)
+			}
+		}
+		var s2 string
+		for _, v := range sb.SB_date_lstmount {
+			if v != 0 {
+				s = s + string(v)
+			}
+		}
+
+		var body string = "digraph test { graph [ratio=fill];" +
+			"node [label=\"Grafica\", fontsize=15, shape=plaintext];" +
+			"graph [bb=\"0,0,352,154\"];" +
+			"arset [label=<" +
+			"<TABLE>" +
+			"<TR>" + "<TD>SB_hd_name</TD>" + "<TD>" + s + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_date</TD>" + "<TD>" + s1 + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_date_lstmount</TD>" + "<TD>" + s2 + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_AVD_count</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_AVD_count)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_AVD_details_count</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_AVD_details_count)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_Inodes_count</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_Inodes_count)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_blocks_count</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_blocks_count)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_AVD_free</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_AVD_free)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_Inodes_free</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_Inodes_free)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_blocks_free</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_blocks_free)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_mount_count</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_mount_count)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_bitmap_tree_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_bitmap_tree_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_tree_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_tree_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_bitmap_detail_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_bitmap_detail_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_detail_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_detail_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_bitmap_table_inode</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_bitmap_table_inode)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_table_inode</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_table_inode)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_bitmap_blocks</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_bitmap_blocks)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_blocks</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_blocks)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_ap_log</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_ap_log)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_size_struct_tree_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_size_struct_tree_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_size_struct_detail_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_size_struct_detail_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_size_struct_inodo</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_size_struct_inodo)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_size_struct_block</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_size_struct_block)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_first_free_bit_tree_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_first_free_bit_tree_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_first_free_bit_detail_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_first_free_bit_detail_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_first_free_bit_table_dir</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_first_free_bit_table_dir)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_first_free_bit_block</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_first_free_bit_block)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_magic_num</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_magic_num)) + "</TD>" + "</TR>" +
+			"<TR>" + "<TD>SB_free_space</TD>" + "<TD>" + strconv.Itoa(int(sb.SB_free_space)) + "</TD>" + "</TR>"
+		body = body + "</TABLE>" + ">, ];}"
+
+		dir, name := filepath.Split(path)
+
+		GeneratePNG(name, body, dir)
+	}
+}
 
 //se guarda la direccion del proyecto
 var rootDir = FUNCTION.RootDir()
@@ -40,7 +137,7 @@ func CreateMBRReport(mbr STRUCTURES.MBR) {
 	body = body + "</TABLE>" +
 		">, ];}"
 
-	GeneratePNG("mbr", body)
+	GeneratePNG("mbr.jpg", body, rootDir+"/reports/dots/")
 
 }
 
@@ -142,7 +239,7 @@ func CreateDiskReport(mbr STRUCTURES.MBR, diskName string) {
 
 				//VERIFICO LAS PARTICIONES PRIMARIAS
 				if string(part.Part_type) == "P" {
-					body = body + "<td WIDTH=\"" + strconv.Itoa(int(part1len)) + "\" >" + GetString(part.Part_name) + " " + strconv.Itoa(int(part.Part_size)) + "</td>"
+					body = body + "<td WIDTH=\"" + strconv.Itoa(int(part1len)) + "\" >" + GetString1(part.Part_name) + " " + strconv.Itoa(int(part.Part_size)) + "</td>"
 					totalDiscoOcupado = totalDiscoOcupado + part.Part_size
 
 					//VERIFICO LAS PARTICIONES EXTENDIDAS
@@ -167,10 +264,10 @@ func CreateDiskReport(mbr STRUCTURES.MBR, diskName string) {
 
 								if extended.Part_partition[i].Part_isEmpty == 1 {
 									var ebrAuxiliar = extended.Part_ebr[i]
-									body = body + "<td WIDTH=\"" + strconv.Itoa(int(ebrAuxiliar.Part_size)) + "\" > " + GetString(ebrAuxiliar.Part_name) + ":" + strconv.Itoa(int(ebrAuxiliar.Part_size)) + "</td >"
+									body = body + "<td WIDTH=\"" + strconv.Itoa(int(ebrAuxiliar.Part_size)) + "\" > " + GetString1(ebrAuxiliar.Part_name) + ":" + strconv.Itoa(int(ebrAuxiliar.Part_size)) + "</td >"
 									var logicaAuxiliar = extended.Part_partition[i]
 									var lenlogic = logicaAuxiliar.Part_size / 100
-									body = body + "<td WIDTH=\"" + strconv.Itoa(int(lenlogic)) + "\"> " + GetString(logicaAuxiliar.Part_name) + " :" + strconv.Itoa(int(logicaAuxiliar.Part_size)) + "</td >"
+									body = body + "<td WIDTH=\"" + strconv.Itoa(int(lenlogic)) + "\"> " + GetString1(logicaAuxiliar.Part_name) + " :" + strconv.Itoa(int(logicaAuxiliar.Part_size)) + "</td >"
 
 									espacioExtendidoLIbre = espacioExtendidoLIbre - ebrAuxiliar.Part_size - logicaAuxiliar.Part_size
 
@@ -198,20 +295,22 @@ func CreateDiskReport(mbr STRUCTURES.MBR, diskName string) {
 
 	body = body + "</tr></table>>];}"
 
-	GeneratePNG("disk", body)
+	GeneratePNG("disk.jpg", body, rootDir+"/reports/dots/")
 }
 
-func GeneratePNG(nombre string, body string) {
+func GeneratePNG(nombre string, body string, path string) {
 
-	if FUNCTION.IfExistFile(rootDir + "/reports/dots/" + nombre + ".dot") {
-		err := os.Remove(rootDir + "/reports/dots/" + nombre + ".dot")
+	FUNCTION.CreateADirectory(path)
+
+	if FUNCTION.IfExistFile(path + nombre + ".dot") {
+		err := os.Remove(path + nombre + ".dot")
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 	}
 
-	f, err := os.Create(rootDir + "/reports/dots/" + nombre + ".dot")
+	f, err := os.Create(path + nombre + ".dot")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -219,10 +318,10 @@ func GeneratePNG(nombre string, body string) {
 
 	f.WriteString(body)
 
-	app := "dot -Tpng "
-	arg1 := "\"" + rootDir + "/reports/dots/" + nombre + ".dot" + "\""
+	app := "dot -Tjpg "
+	arg1 := "\"" + path + nombre + ".dot" + "\""
 	arg2 := " -o "
-	arg3 := " \"" + rootDir + "/reports/pngs/" + nombre + ".png" + "\""
+	arg3 := " \"" + path + nombre + "\""
 
 	err, out, errout := Shellout(app + arg1 + arg2 + arg3)
 	if err != nil {
@@ -246,7 +345,7 @@ func Shellout(command string) (error, string, string) {
 	return err, stdout.String(), stderr.String()
 }
 
-func GetString(str [16]byte) string {
+func GetString1(str [16]byte) string {
 	var cadena = ""
 	for i := 0; i < len(str); i++ {
 		if string(str[i]) == "+" {

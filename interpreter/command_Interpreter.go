@@ -87,6 +87,10 @@ func GetCommand(commandEntry string) {
 		fmt.Println("--" + commandEntry)
 		ChmodCommand(arCommand)
 		break
+	case "rep":
+		fmt.Println("--" + commandEntry)
+		RepCommand(arCommand)
+		break
 
 	default:
 		if !strings.Contains(command, "#") {
@@ -727,6 +731,7 @@ func MKFileCommand(arCommand []string) {
 			break
 		}
 	}
+
 	if id == "" || path == "" {
 		error = true
 	}
@@ -740,5 +745,40 @@ func MKFileCommand(arCommand []string) {
 }
 
 func RepCommand(arCommand []string) {
+	var nombre string = ""
+	var path string = ""
+	var id string = ""
+	var ruta string = ""
+	//Manejar un error
+	var error bool = false
 
+	for i := 1; i < len(arCommand); i++ {
+		var commandToExecute = strings.Split(arCommand[i], "->")
+		var aux string = strings.ToLower(commandToExecute[0])
+		switch aux {
+		case "-id":
+			id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-path":
+			path = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-ruta":
+			ruta = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		case "-nombre":
+			nombre = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			break
+		}
+	}
+
+	if id == "" || path == "" || nombre == "" {
+		error = true
+	}
+	//Verifica que no haya error
+	if !error {
+
+		EXECUTE.MakeAReport(path, id, strings.ToLower(nombre), ruta)
+	} else {
+		fmt.Println("Error al ejecutar el comando MKUSR")
+	}
 }

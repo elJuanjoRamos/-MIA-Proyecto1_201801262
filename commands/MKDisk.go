@@ -12,7 +12,6 @@ import (
 
 	CONTROLLER "../controllers"
 	FUNCTION "../functions"
-	REPORTS "../reports"
 	STRUCTURES "../structures"
 )
 
@@ -74,9 +73,9 @@ func WriteFile(path string, name string) {
 	binary.Write(&binario3, binary.BigEndian, s1)
 	escribirBytes(file, binario3.Bytes())
 
-	REPORTS.CreateMBRReport(disco)
+	CreateMBRReport(disco)
 
-	REPORTS.CreateDiskReport(disco, name)
+	CreateDiskReport(disco, name)
 }
 
 //Método para escribir en un archivo.

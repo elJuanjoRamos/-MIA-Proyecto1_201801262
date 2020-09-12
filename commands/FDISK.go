@@ -14,7 +14,6 @@ import (
 
 	CONTROLLER "../controllers"
 	FUNCTION "../functions"
-	REPORTS "../reports"
 	STRUCTURES "../structures"
 )
 
@@ -89,8 +88,8 @@ func FormatDisk(path string, partitionSize int64, partitionName string, partitio
 			var binario3 bytes.Buffer
 			binary.Write(&binario3, binary.BigEndian, s1)
 			escribirBytes(file, binario3.Bytes())
-			REPORTS.CreateMBRReport(m)
-			REPORTS.CreateDiskReport(m, diskName)
+			CreateMBRReport(m)
+			CreateDiskReport(m, diskName)
 
 			/*} else {
 				fmt.Println("No se puede escribir mas particiones en el disco")
@@ -272,8 +271,8 @@ func DeletePartition(path string, partitionName string, delete string) {
 				var binario3 bytes.Buffer
 				binary.Write(&binario3, binary.BigEndian, s1)
 				escribirBytes(file, binario3.Bytes())
-				REPORTS.CreateMBRReport(m)
-				REPORTS.CreateDiskReport(m, diskName)
+				CreateMBRReport(m)
+				CreateDiskReport(m, diskName)
 
 			} else {
 				fmt.Println("La particion con nombre '" + partitionName + "' no exite en el disco")

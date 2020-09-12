@@ -16,21 +16,8 @@ Fdisk -sizE->2 -unit->k -fit->WF -path->"/home/eljuanjoramos/Documentos/ARCHIVOS
 pause
 mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part1 
 pause
-mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part4 
+mkfs -id->vda1 -type->full
 pause
-mount
+login -usr->root -pwd->201801262 -id->vda1
 pause
-unmount -id1->vda1
-pause
-mount
-pause
-mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part1 
-pause
-mount -path->"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/main/Hoja1_201801262.dsk" -name->Part3 
-pause
-mount
-pause
-unmount -id1->vda1 -id1->vda5 -id1->vdb1
-pause
-mount
-
+rep -id->vda1 -path->"/home/user/reports/reporte 3.jpg" -nombre->sb
