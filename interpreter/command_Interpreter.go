@@ -689,6 +689,7 @@ func MKDirCommand(arCommand []string) {
 	}
 }
 
+// ===== MKFILE
 func MKFileCommand(arCommand []string) {
 	var p string = ""
 	var path string = ""
@@ -731,7 +732,6 @@ func MKFileCommand(arCommand []string) {
 			break
 		}
 	}
-
 	if id == "" || path == "" {
 		error = true
 	}
@@ -744,6 +744,7 @@ func MKFileCommand(arCommand []string) {
 	}
 }
 
+//==== REPORTES
 func RepCommand(arCommand []string) {
 	var nombre string = ""
 	var path string = ""

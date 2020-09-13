@@ -4,12 +4,13 @@
 //pause
 //mount
 //pause
-//mkfs -id->vda1 -type->full
 //mkfs -id->vdb1 -type->full
 //pause
 
 
-//login -usr->root -pwd->201801262 -id->vda1
+login -usr->root -pwd->201801262 -id->vda1
+pause
+rep -id->vda1 -path->"/home/user/reports/reporte 3.jpg" -nombre->sb
 
 
 //pause

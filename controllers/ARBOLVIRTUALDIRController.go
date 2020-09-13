@@ -17,7 +17,7 @@ func MakeAnDirectoryInDisk(sb STRUCTURES.SUPERBOOT, path string, p string, file 
 	//OBTENGO EL ARBOL DE ROOT
 
 	if p != "" { //SIGNIFICA QUE BUSCO EL DIRECOTIRIO Y SI NO EXISTE, LO CREO
-		SearchAndCreateDir(sb.SB_ap_tree_dir, sb, path, file, username)
+		SearchAndCreateDir(sb.SB_ap_tree_dir, sb, path, "/", file, username)
 	} else {
 		//PARTO EL PATH
 		var pathlist []string = strings.Split(path, "/")
@@ -31,12 +31,12 @@ func MakeAnDirectoryInDisk(sb STRUCTURES.SUPERBOOT, path string, p string, file 
 
 }
 
-func SearchAndCreateDir(inicioArbol int64, sb STRUCTURES.SUPERBOOT, path string, file *os.File, username string) {
+func SearchAndCreateDir(inicioArbol int64, sb STRUCTURES.SUPERBOOT, path string, pathPadre string, file *os.File, username string) {
 
 	if len(path) != 0 {
 		//OBTENGO EL ARBOL
 		var arbol = GetArbolVirual(inicioArbol, file)
-
+		pathPadre = GetStringByBytes(arbol.Avd_nombre_directorio)
 		//PARTO EL PATH QUE VIENE
 		var pathlist []string = strings.Split(path, "/")
 		var banderaBuscado = false
@@ -70,32 +70,60 @@ func SearchAndCreateDir(inicioArbol int64, sb STRUCTURES.SUPERBOOT, path string,
 				}
 			}
 
-			if banderaBuscado { // SI EXISTE LA PATH EN ESE MOMENTO, ENVIO LA
+			if banderaBuscado { // SI EXISTE LA PATH EN ESE MOMENTO,
 				//EN LOS SUBDIRECTORIOS
 				for i := 2; i < len(pathlist); i++ {
 					stringTemporal = stringTemporal + "/" + pathlist[i]
 				}
 				path = stringTemporal
 
-				SearchAndCreateDir(bit, sb, path, file, username)
+				SearchAndCreateDir(bit, sb, path, pathPadre, file, username)
 				//SI LA BANDERA ES FALSA, SIGNIFICA QUE NO EXISTE EL
 
 			} else { //SI BANDERA SIGUE FALSO, SIGNIFICA QUE VOY A CREAR UN NUEVO ARBOL Y AL ARBOL ORIGINAL, LE VOY
 				var inicioTemp int64 = 0
 				//A INSERTAR EL NUEVO ARBOL CREADO
+				var bandera = false
 				for i := 0; i < len(arbol.Avd_ap_array_subdirectorios); i++ {
 					if arbol.Avd_ap_array_subdirectorios[i] == -1 {
 						arbol.Avd_ap_array_subdirectorios[i] = CreateArbolVirtual(pathlist[1], sb, file, username)
 						inicioTemp = arbol.Avd_ap_array_subdirectorios[i]
+						bandera = true
 						break
 					}
 				}
 
-				for i := 2; i < len(pathlist); i++ {
+				/*///////////////////////////////////////////////////////////
+
+								ESTO ES NUEVO
+
+
+				/////////////////////////////////////////////////////////*/
+
+				var inicio = 2
+				if !bandera { // SI LA BANDERA SIGUE FALSO, SIGNIFICA QUE YA NO HAY ESPACIO EN EL ARREGLO, HAY QUE CREAR UN
+					//APUNTADOR INDIRECTO
+					if arbol.Avd_ap_arbol_virtual_directorio == -1 {
+
+						arbol.Avd_ap_arbol_virtual_directorio = CreateArbolVirtual(pathPadre, sb, file, username)
+						inicio = 1
+					}
+					inicioTemp = arbol.Avd_ap_arbol_virtual_directorio
+
+				}
+
+				/*///////////////////////////////////////////////////////////
+
+								TERMINA LO NUEVO
+
+
+				/////////////////////////////////////////////////////////*/
+
+				for i := inicio; i < len(pathlist); i++ {
 					stringTemporal = stringTemporal + "/" + pathlist[i]
 				}
 				path = stringTemporal
-				SearchAndCreateDir(inicioTemp, sb, path, file, username)
+				SearchAndCreateDir(inicioTemp, sb, path, pathPadre, file, username)
 
 			}
 
@@ -135,7 +163,6 @@ func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPE
 
 					var arbolSiguiente = GetArbolVirual(inicio, file)
 					if GetStringByBytes(arbolSiguiente.Avd_nombre_directorio) == CorregirName(pathlist[1]) {
-						fmt.Println("entro a " + pathlist[1])
 						bit = arbol.Avd_ap_array_subdirectorios[i]
 						banderaBuscado = true
 						break
@@ -154,13 +181,26 @@ func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPE
 
 				//SI LA BANDERA ES FALSA, SIGNIFICA QUE NO EXISTE EL DIRECTORIO
 
-			} else { //SI BANDERA SIGUE FALSO, SIGNIFICA QUE VOY A CREAR UN NUEVO ARBOL Y AL ARBOL ORIGINAL, LE VOY
+			} else {
 
-				fmt.Println("==================================")
-				fmt.Println("	ALERTA		   ")
-				fmt.Println("   LA PATH:" + path)
-				fmt.Println(" no existe y no tiene permisos para crearla")
-				fmt.Println("==================================")
+				if arbol.Avd_ap_arbol_virtual_directorio != -1 {
+
+					SearchDir(path, dir, username, arbol.Avd_ap_arbol_virtual_directorio, sb, file)
+
+				} else {
+					fmt.Println("==================================")
+					fmt.Println("	ALERTA		   ")
+					fmt.Println("   LA PATH:" + path)
+					fmt.Println(" no existe y no tiene permisos para crearla")
+					fmt.Println("==================================")
+				}
+
+				/*///////////////////////////////////////////////////////////
+
+								ESTO ES NUEVO
+
+
+				/////////////////////////////////////////////////////////*/
 
 			}
 		}
@@ -215,6 +255,7 @@ func CreateArbolVirtual(path string, sb STRUCTURES.SUPERBOOT, file *os.File, use
 	var tree = STRUCTURES.ARBOLVIRTUALDIR{
 		Avd_ap_detalle_directorio:       -1,
 		Avd_ap_arbol_virtual_directorio: -1,
+		Avd_num:                         contador + 1,
 	}
 	tree.Avd_ap_array_subdirectorios[0] = -1
 	tree.Avd_ap_array_subdirectorios[1] = -1
@@ -255,24 +296,6 @@ func GetArbolVirual(inodoInicio int64, file *os.File) STRUCTURES.ARBOLVIRTUALDIR
 	}
 
 	return m
-}
-
-func GetLastArbolInserted(sb STRUCTURES.SUPERBOOT, file *os.File) int64 {
-	//ITERO EN EL BITMAP DE DIRECTORIOS PARA SABER CUANTOS HAY
-	file.Seek(sb.SB_ap_bitmap_tree_dir, 0)
-	b1 := make([]byte, (sb.SB_ap_tree_dir - sb.SB_ap_bitmap_tree_dir))
-	n1, err := file.Read(b1)
-	if err != nil {
-
-	}
-	///CONTAMOS LA CANTIDAD DE ARBOLES CREADOS
-	var contador int64 = 0
-	for i := 0; i < len(string(b1[:n1])); i++ {
-		if string(b1[:n1][i]) == "1" {
-			contador = contador + 1
-		}
-	}
-	return sb.SB_ap_tree_dir + (contador * int64(unsafe.Sizeof(STRUCTURES.ARBOLVIRTUALDIR{})))
 }
 
 func GetStringByBytes(name [20]byte) string {

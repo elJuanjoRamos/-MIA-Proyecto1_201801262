@@ -102,18 +102,12 @@ func CreateADirectory(path string) {
 }
 
 func CreateAFile(path string, text string) {
-
-	if !IfExistFile(path) {
-		//Se crea el archivo user txt que contiene
-		file, err := os.Create(path)
-		defer file.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-		file.WriteString(text)
-	} else {
-		fmt.Println("El archivo ya existe")
+	file, err := os.Create(path)
+	defer file.Close()
+	if err != nil {
+		log.Fatal(err)
 	}
+	file.WriteString(text)
 
 }
 

@@ -20,11 +20,20 @@ func MakeAReport(path, id, nombre, ruta string) {
 	case "sb":
 		MakeASBReport(path, id, ruta)
 		break
-	case "condition":
+	case "bm_arbdir":
+		MakeABitMapReport(path, id, ruta, 1)
 		break
-	case "f":
+	case "bm_detdir":
+		MakeABitMapReport(path, id, ruta, 2)
 		break
-	case "ff":
+	case "bm_inode":
+		MakeABitMapReport(path, id, ruta, 3)
+		break
+	case "bm_block":
+		MakeABitMapReport(path, id, ruta, 4)
+		break
+	case "directorio":
+		MakeAGenaralDirecoryReport(path, id, ruta)
 		break
 	case "ffff":
 		break
@@ -57,13 +66,13 @@ func MakeASBReport(path, id, ruta string) { //REPORTE DEL SUPER BOOT
 		var s1 string
 		for _, v := range sb.SB_date {
 			if v != 0 {
-				s = s + string(v)
+				s1 = s1 + string(v)
 			}
 		}
 		var s2 string
 		for _, v := range sb.SB_date_lstmount {
 			if v != 0 {
-				s = s + string(v)
+				s2 = s2 + string(v)
 			}
 		}
 
@@ -72,6 +81,7 @@ func MakeASBReport(path, id, ruta string) { //REPORTE DEL SUPER BOOT
 			"graph [bb=\"0,0,352,154\"];" +
 			"arset [label=<" +
 			"<TABLE>" +
+			"<TR>" + "<TD>Reporte: </TD>" + "<TD> Super Boot </TD>" + "</TR>" +
 			"<TR>" + "<TD>SB_hd_name</TD>" + "<TD>" + s + "</TD>" + "</TR>" +
 			"<TR>" + "<TD>SB_date</TD>" + "<TD>" + s1 + "</TD>" + "</TR>" +
 			"<TR>" + "<TD>SB_date_lstmount</TD>" + "<TD>" + s2 + "</TD>" + "</TR>" +
@@ -107,7 +117,283 @@ func MakeASBReport(path, id, ruta string) { //REPORTE DEL SUPER BOOT
 		dir, name := filepath.Split(path)
 
 		GeneratePNG(name, body, dir)
+	} else {
+		fmt.Println("La particion con ID: " + id + " no esta montada")
 	}
+}
+
+func MakeABitMapReport(path, id, ruta string, types int) { ////REPORTES DE BITMAPS
+	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+		var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+
+		//SE ABRE EL ARCHIVO
+		file, err := os.OpenFile(partition.Mount_path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+		defer file.Close()
+		if err != nil {
+			fmt.Println("Hay un error, no se pudo abrir el disco duro")
+		}
+		//OBTENGO EL SUPER BOOT
+		var sb = GetSuperBoot(partition.Mount_part.Part_start, file) //GET SUPER BOOT SE ENCUENTRA FORMAT_FIRSTTIME.GO
+
+		var inicio int64 = 0
+		var fin int64 = 0
+
+		switch types {
+		case 1:
+			inicio = sb.SB_ap_bitmap_tree_dir
+			fin = sb.SB_ap_tree_dir
+			break
+		case 2:
+			inicio = sb.SB_ap_bitmap_detail_dir
+			fin = sb.SB_ap_detail_dir
+			break
+		case 3:
+			inicio = sb.SB_ap_bitmap_table_inode
+			fin = sb.SB_ap_table_inode
+			break
+		case 4:
+			inicio = sb.SB_ap_bitmap_blocks
+			fin = sb.SB_ap_blocks
+			break
+
+		}
+
+		file.Seek(inicio, 0)
+		b1 := make([]byte, (fin - inicio))
+		n1, err := file.Read(b1)
+		if err != nil {
+
+		}
+		var contador int64 = 0
+		var str = ""
+		for i := 0; i < len(string(b1[:n1])); i++ {
+			if contador == 19 {
+				str = str + string(b1[:n1][i]) + "\n"
+				contador = 0
+			} else {
+				str = str + string(b1[:n1][i]) + "|"
+				contador = contador + 1
+			}
+		}
+
+		dir, name := filepath.Split(path)
+
+		FUNCTION.CreateADirectory(dir)
+		FUNCTION.CreateAFile(dir+name, str)
+	} else {
+		fmt.Println("La particion con ID: " + id + " no esta montada")
+	}
+}
+
+func MakeAGenaralDirecoryReport(path, id, ruta string) {
+	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+		var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+
+		//SE ABRE EL ARCHIVO
+		file, err := os.OpenFile(partition.Mount_path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+		defer file.Close()
+		if err != nil {
+			fmt.Println("Hay un error, no se pudo abrir el disco duro")
+		}
+		//OBTENGO EL SUPER BOOT
+		var sb = GetSuperBoot(partition.Mount_part.Part_start, file) //GET SUPER BOOT SE ENCUENTRA FORMAT_FIRSTTIME.GO
+
+		//OBTENGO EL ARBOL DE DIRECTORIOS
+		var arbolRoot = CONTROLLER.GetArbolVirual(sb.SB_ap_tree_dir, file)
+		var body = "digraph H {"
+
+		//ROOT
+		var root = "parent [ shape=plaintext \n label=<\n<table border='1' cellborder='1'> \n<tr><td colspan=\"8\">" + GetAllName(arbolRoot.Avd_nombre_directorio) + "</td></tr> " +
+			"\n<tr><td colspan=\"8\">Proper: " + GetAllName(arbolRoot.Avd_proper) + "</td></tr>\n" + "\n<tr><td colspan=\"8\">" + GetFecha(arbolRoot.Avd_fecha_creacion) + "</td></tr>\n<tr>"
+
+		var insideRoot = ""
+		var enlacesRoot = ""
+		var childRoot = ""
+
+		for i := 0; i < len(arbolRoot.Avd_ap_array_subdirectorios); i++ {
+			var data = arbolRoot.Avd_ap_array_subdirectorios[i]
+			if data == -1 {
+				insideRoot = insideRoot + "\n<td port='port'>-1</td>"
+			} else {
+				insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(data)) + "'>" + strconv.Itoa(int(data)) + "</td>"
+				enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(data)) + "   -> child" + strconv.Itoa(int(data)) + ";"
+				childRoot = childRoot + GetAlDirectory(data, "child"+strconv.Itoa(int(data)), file)
+			}
+		}
+
+		/// A DIRECOTRY
+		var detalle = ""
+		fmt.Println("---------")
+		var detallebit = arbolRoot.Avd_ap_detalle_directorio
+		if detallebit != -1 {
+			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td>"
+			detalle = detalle + GetAlDetails(detallebit, "child"+strconv.Itoa(int(detallebit)), file)
+			enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(detallebit)) + "   -> child" + strconv.Itoa(int(detallebit)) + ";"
+		}
+
+		// APUNTADOR INDIRECTO
+		if arbolRoot.Avd_ap_arbol_virtual_directorio != -1 {
+			fmt.Println("entro")
+			var dt = arbolRoot.Avd_ap_arbol_virtual_directorio
+			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>" + strconv.Itoa(int(dt)) + "</td>"
+			enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(dt)) + "   -> child" + strconv.Itoa(int(dt)) + ";"
+			childRoot = childRoot + GetAlDirectory(dt, "child"+strconv.Itoa(int(dt)), file)
+		}
+
+		root = root + insideRoot
+		root = root + "\n</tr></table>>];"
+		body = body + root + childRoot + enlacesRoot + detalle
+
+		body = body + "\n}"
+
+		dir, name := filepath.Split(path)
+
+		GeneratePNG(name, body, dir)
+	} else {
+		fmt.Println("La particion con ID: " + id + " no esta montada")
+	}
+}
+
+func GetAlDirectory(bitInicio int64, name string, file *os.File) string {
+
+	var arbolRoot = CONTROLLER.GetArbolVirual(bitInicio, file)
+
+	var root = "\n" + name + " [ shape=plaintext \nlabel=< \n<table border='1' cellborder='1'> \n<tr><td colspan=\"8\">/" + GetAllName(arbolRoot.Avd_nombre_directorio) + "</td></tr> " +
+		"\n<tr><td colspan=\"4\">Prop:" + GetAllName(arbolRoot.Avd_proper) + "</td><td colspan=\"4\">Num:" + strconv.Itoa(int(arbolRoot.Avd_num)) + "</td></tr>\n" +
+		"\n<tr><td colspan=\"8\">" + GetFecha(arbolRoot.Avd_fecha_creacion) + "</td></tr>\n<tr>"
+
+	var insideRoot = ""
+	var enlacesRoot = ""
+	var childRoot = ""
+
+	//SUBDIRECTORIOS DEL ROOT
+	for i := 0; i < len(arbolRoot.Avd_ap_array_subdirectorios); i++ {
+		var data = arbolRoot.Avd_ap_array_subdirectorios[i]
+		if data == -1 {
+			insideRoot = insideRoot + "\n<td port='port'>-1</td>"
+		} else {
+			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(data)) + "'>" + strconv.Itoa(int(data)) + "</td>"
+			enlacesRoot = enlacesRoot + "\n" + name + ":port" + strconv.Itoa(int(data)) + "   -> child" + strconv.Itoa(int(data)) + ";"
+			childRoot = childRoot + GetAlDirectory(data, "child"+strconv.Itoa(int(data)), file)
+		}
+	}
+
+	/// A DIRECOTRY
+	var detalle = ""
+	var detallebit = arbolRoot.Avd_ap_detalle_directorio
+	if detallebit != -1 {
+		insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td>"
+		detalle = detalle + GetAlDetails(detallebit, "child"+strconv.Itoa(int(detallebit)), file)
+		enlacesRoot = enlacesRoot + "\n" + name + ":port" + strconv.Itoa(int(detallebit)) + "   -> child" + strconv.Itoa(int(detallebit)) + ";"
+	}
+
+	// APUNTADOR INDIRECTO
+	if arbolRoot.Avd_ap_arbol_virtual_directorio != -1 {
+		fmt.Println("entro")
+		var dt = arbolRoot.Avd_ap_arbol_virtual_directorio
+		insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>I: " + strconv.Itoa(int(dt)) + "</td>"
+		enlacesRoot = enlacesRoot + "\n" + name + ":port" + strconv.Itoa(int(dt)) + "   -> child" + strconv.Itoa(int(dt)) + ";"
+		childRoot = childRoot + GetAlDirectory(dt, "child"+strconv.Itoa(int(dt)), file)
+	}
+
+	root = root + insideRoot
+	root = root + "\n</tr>\n</table>>];\n" + childRoot + enlacesRoot + detalle
+
+	return root
+}
+
+func GetAlDetails(bitInicio int64, name string, file *os.File) string {
+	var detalle = CONTROLLER.GETDetails(bitInicio, file) // ESTA FUNCION ESTA EN DIRECTORY DETAIL CONTROLLER
+	var body = "\n" + name + " [ shape=plaintext label=<  <table border='1' cellborder='1'> " +
+		" <tr><td colspan=\"4\">Detail</td><td colspan=\"4\">" + strconv.Itoa(int(detalle.DD_num)) + "</td></tr>"
+
+	var interior = ""
+	var inodos = ""
+	var apuntadores = ""
+	if detalle.DD_file_lleno == true {
+		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "'>" +
+			strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "</td>\n</tr>\n"
+
+		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + ";"
+		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo)), file)
+	}
+	if detalle.DD_file_lleno2 == true {
+		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre2) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "'>" +
+			strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "</td>\n</tr>\n"
+
+		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + ";"
+		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo2, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo2)), file)
+
+	}
+	if detalle.DD_file_lleno3 == true {
+		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre3) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "'>" +
+			strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "</td>\n</tr>\n"
+
+		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + ";"
+		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo3, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo3)), file)
+
+	}
+	if detalle.DD_file_lleno4 == true {
+		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre4) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "'>" +
+			strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "</td>\n</tr>\n"
+
+		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + ";"
+		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo4, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo4)), file)
+
+	}
+	if detalle.DD_file_lleno5 == true {
+		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre5) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "'>" +
+			strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "</td>\n</tr>\n"
+
+		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + ";"
+		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo5, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo5)), file)
+
+	}
+
+	body = body + interior
+
+	body = body + "</table> >]" + inodos + apuntadores
+	return body
+}
+
+func GetAlInodes(bitInicio int64, name string, file *os.File) string {
+
+	var inodo = CONTROLLER.GETInode(bitInicio, file)
+
+	var body = "\n" + name + " [shape=plaintext label=<<table border='1' cellborder='1'>\n <tr><td colspan=\"2\">Inodo</td></tr>"
+
+	var enlaces = ""
+	var bloques = ""
+	body = body + "\n<tr><td colspan=\"2\"> Numero:" + strconv.Itoa(int(inodo.I_count_inodo)) + "</td></tr>"
+	body = body + "\n<tr><td colspan=\"2\"> Size File:" + strconv.Itoa(int(inodo.I_size_archivo)) + "</td></tr>"
+	body = body + "\n<tr><td colspan=\"2\"> B. Asig:" + strconv.Itoa(int(inodo.I_count_bloques_asignados)) + "</td></tr>"
+
+	for i := 0; i < len(inodo.I_array_bloques); i++ {
+		if inodo.I_array_bloques[i] != 0 {
+			body = body + " <tr><td>Block</td> <td port='port" + strconv.Itoa(int(inodo.I_array_bloques[i])) + "'> " + strconv.Itoa(int(inodo.I_array_bloques[i])) + " </td> " + "</tr>"
+			enlaces = enlaces + "\n" + name + ":port" + strconv.Itoa(int(inodo.I_array_bloques[i])) + "   -> child" + strconv.Itoa(int(inodo.I_array_bloques[i])) + ";"
+			bloques = bloques + GetAlBloques(inodo.I_array_bloques[i], "child"+strconv.Itoa(int(inodo.I_array_bloques[i])), file)
+
+		}
+	}
+
+	body = body + "</table>>];" + enlaces + bloques
+	return body
+}
+
+func GetAlBloques(bitInicio int64, name string, file *os.File) string {
+	var bloque, encontrado = CONTROLLER.GetBlockOcupado(bitInicio, file)
+
+	var body = "\n" + name + " [ shape=plaintext label=<<table border='1' cellborder='1'>"
+
+	if encontrado {
+		body = body + "<tr><td colspan=\"2\">Block</td></tr>"
+
+		body = body + "<tr><td colspan=\"2\">" + GetContentBlock(bloque.DB_data) + "</td></tr>"
+
+	}
+	body = body + "</table> >];"
+	return body
 }
 
 //se guarda la direccion del proyecto
@@ -346,6 +632,37 @@ func Shellout(command string) (error, string, string) {
 }
 
 func GetString1(str [16]byte) string {
+	var cadena = ""
+	for i := 0; i < len(str); i++ {
+		if string(str[i]) == "+" {
+			break
+		}
+		cadena = cadena + string(str[i])
+	}
+	return cadena
+}
+
+func GetAllName(str [20]byte) string {
+	var cadena = ""
+	for i := 0; i < len(str); i++ {
+		if string(str[i]) == "+" {
+			break
+		}
+		cadena = cadena + string(str[i])
+	}
+	return cadena
+}
+func GetContentBlock(str [25]byte) string {
+	var s string
+	for _, v := range str {
+		if v != 0 {
+			s = s + string(v)
+		}
+	}
+	return s
+}
+
+func GetFecha(str [19]byte) string {
 	var cadena = ""
 	for i := 0; i < len(str); i++ {
 		if string(str[i]) == "+" {

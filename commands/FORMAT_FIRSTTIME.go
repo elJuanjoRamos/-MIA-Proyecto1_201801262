@@ -43,6 +43,7 @@ func MakeADirFirsTime(path string, id string) {
 			var tree = STRUCTURES.ARBOLVIRTUALDIR{
 				Avd_ap_detalle_directorio:       sb.SB_ap_detail_dir,
 				Avd_ap_arbol_virtual_directorio: -1,
+				Avd_num:                         1,
 			}
 			var time = time.Now()
 			copy(tree.Avd_fecha_creacion[:], time.Format("2006-01-02 15:04:05"))
@@ -72,13 +73,15 @@ func MakeADirFirsTime(path string, id string) {
 
 			//CREAMOS EL PRIMER DETALLE Y LLENAMOS EL PRIMER FILE
 			var dirInit = STRUCTURES.DIRECTORYDETAIL{
-				DD_file_ap_inodo:         sb.SB_ap_bitmap_table_inode, //Como es la primera vez que lo creamos, el apuntador inodo de ese detalle, el el inicio del inodo
+				DD_file_ap_inodo:         sb.SB_ap_table_inode, //Como es la primera vez que lo creamos, el apuntador inodo de ese detalle, el el inicio del inodo
 				DD_file_lleno:            true,
 				DD_ap_detalle_directorio: 0,
+				///NUEVO
+				DD_num: 1,
 			}
 			copy(dirInit.DD_file_date_creacion[:], time.Format("2006-01-02 15:04:05"))
 			copy(dirInit.DD_file_date_modificacion[:], time.Format("2006-01-02 15:04:05"))
-			copy(dirInit.DD_file_nombre[:], "users.txt")
+			copy(dirInit.DD_file_nombre[:], "users.txt+++++++++++")
 
 			//ESCRIBIMOS EL PRIMER DETALLE
 			dirInit1 := &dirInit

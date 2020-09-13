@@ -121,6 +121,8 @@ type ARBOLVIRTUALDIR struct {
 	Avd_ap_detalle_directorio       int64
 	Avd_ap_arbol_virtual_directorio int64
 	Avd_proper                      [20]byte
+	///NUEVO
+	Avd_num int64
 }
 
 type DIRECTORYDETAIL struct {
@@ -161,6 +163,8 @@ type DIRECTORYDETAIL struct {
 	DD_file_lleno5             bool
 
 	DD_ap_detalle_directorio int64
+	///NUEVO
+	DD_num int64
 }
 
 type TABLEINODE struct {
