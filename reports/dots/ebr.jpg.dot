@@ -1,0 +1,1 @@
+digraph H {rankdir="LR" parent [ shape=plaintext label=<<table border='1' cellborder='1'> <tr><td colspan="5">EBR PARTITIONS</td></tr><tr><td WIDTH="56" > EBRPrimeraLogica:56</td ><td WIDTH="20"> PrimeraLogica1 :2048</td ><td WIDTH="56" > EBRSegundaLogica:56</td ><td WIDTH="20"> SegundaLogica1 :2048</td ><td WIDTH="265" > Ext Libre: 26512</td ></tr></table>>];}

@@ -22,16 +22,25 @@ login -usr->root -pwd->201801262 -id->vda1
 pause
 Mkdir -P -id->vda1 -path->"/home/user/usac"
 pause
-mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/a.txt" -p -cont->"bloque de 25 caracteeres bloque de 50 caracteeres bloque de 100 caracteres bloque de 125 caracteres bloque de 150 caracteres bloque de 175 caracteres bloque de 200 caracteres bloque de 225 caracteres bloque de 250 caracteres" 
+mkFile -SIZE->42 -id->vda1 -PatH->"/home/user/docs/a.txt" -p  -cont->"hola mundo desde archivo a, esto es prueba"
 pause
+mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/b.txt" -p  -cont->"hola mundo desde archivo b"
+pause
+mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/c.txt" -p  -cont->"hola mundo desde archivo c"
+pause
+mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/d.txt" -p  -cont->"hola mundo desde archivo d"
+pause
+#Cat -file1->"/home/user/docs/a.txt" -Id->vda1
+Cat -file1->"/home/user/docs/a.txt" -Id->vda1 -file1->"/home/user/docs/b.txt"  -file1->"/home/user/docs/c.txt"
 
+#rep -id->vda1 -path->"/home/user/reports/reporte 3.jpg" -nombre->sb
+#rep -id->vda1 -path->"/home/user/reports/bitmapArbol.txt" -nombre->bm_arbdir
+#rep -id->vda1 -path->"/home/user/reports/bm_detdir.txt" -nombre->bm_detdir
+#rep -id->vda1 -path->"/home/user/reports/bm_inode.txt" -nombre->bm_inode
+#rep -id->vda1 -path->"/home/user/reports/bm_block.txt" -nombre->bm_block
+#rep -id->vda1 -path->"/home/user/reports/arbol.jpg" -nombre->directorio
+#rep -id->vda1 -path->"/home/user/reports/tree_file.jpg" -nombre->tree_file
 
-rep -id->vda1 -path->"/home/user/reports/reporte 3.jpg" -nombre->sb
-rep -id->vda1 -path->"/home/user/reports/bitmapArbol.txt" -nombre->bm_arbdir
-rep -id->vda1 -path->"/home/user/reports/bm_detdir.txt" -nombre->bm_detdir
-rep -id->vda1 -path->"/home/user/reports/bm_inode.txt" -nombre->bm_inode
-rep -id->vda1 -path->"/home/user/reports/bm_block.txt" -nombre->bm_block
-rep -id->vda1 -path->"/home/user/reports/arbol.jpg" -nombre->directorio
 
 
 

@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"unsafe"
 
 	CONTROLLER "../controllers"
 	FUNCTION "../functions"
@@ -35,7 +36,8 @@ func MakeAReport(path, id, nombre, ruta string) {
 	case "directorio":
 		MakeAGenaralDirecoryReport(path, id, ruta)
 		break
-	case "ffff":
+	case "tree_file":
+		TreeFileReport(path, id, ruta)
 		break
 	case "fffff":
 		break
@@ -44,6 +46,7 @@ func MakeAReport(path, id, nombre, ruta string) {
 	}
 }
 
+//====================== REPORTE SUPER BOOT
 func MakeASBReport(path, id, ruta string) { //REPORTE DEL SUPER BOOT
 	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
 		var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
@@ -122,6 +125,7 @@ func MakeASBReport(path, id, ruta string) { //REPORTE DEL SUPER BOOT
 	}
 }
 
+///===================== REPORTE BITMAP
 func MakeABitMapReport(path, id, ruta string, types int) { ////REPORTES DE BITMAPS
 	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
 		var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
@@ -185,6 +189,7 @@ func MakeABitMapReport(path, id, ruta string, types int) { ////REPORTES DE BITMA
 	}
 }
 
+//===================REPORTE GENRAL
 func MakeAGenaralDirecoryReport(path, id, ruta string) {
 	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
 		var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
@@ -417,6 +422,106 @@ func GetAlBloques(bitInicio int64, name string, file *os.File) string {
 	return body
 }
 
+///======================TREE FILE
+
+func TreeFileReport(path, id, ruta string) {
+
+	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+		var partition = GetPartitionById(id) //Obtengo la particion montada, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+
+		//SE ABRE EL ARCHIVO
+		file, err := os.OpenFile(partition.Mount_path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+		defer file.Close()
+		if err != nil {
+			fmt.Println("Hay un error, no se pudo abrir el disco duro")
+		}
+		//OBTENGO EL SUPER BOOT
+		var sb = GetSuperBoot(partition.Mount_part.Part_start, file) //GET SUPER BOOT SE ENCUENTRA FORMAT_FIRSTTIME.GO
+
+		//ITERO EN EL BITMAP DE DETALLES PARA SABER CUANTOS HAY Y EN QUE POSICION DEBO CREAR EL NUEVO BLOQUE
+		file.Seek(sb.SB_ap_bitmap_detail_dir, 0)
+		b1 := make([]byte, (sb.SB_ap_detail_dir - sb.SB_ap_bitmap_detail_dir))
+		n1, err := file.Read(b1)
+		if err != nil {
+
+		}
+		var contador int = 0
+		for i := 0; i < len(string(b1[:n1])); i++ {
+			if string(b1[:n1][i]) == "1" {
+				contador = contador + 1
+			}
+		}
+
+		//var fileNames = ""
+
+		GetFileNamesInDetails(sb.SB_ap_detail_dir, contador, file)
+		/*//OBTENGO EL ARBOL DE DIRECTORIOS
+		var arbolRoot = CONTROLLER.GetArbolVirual(sb.SB_ap_tree_dir, file)
+		var body = "digraph H { rankdir=\"LR\" "
+
+		//ROOT
+		var root = "parent [ shape=plaintext \n label=<\n<table border='1' cellborder='1'> \n<tr><td colspan=\"8\">" + GetAllName(arbolRoot.Avd_nombre_directorio) + "</td></tr> " +
+			"\n<tr><td colspan=\"8\">Proper: " + GetAllName(arbolRoot.Avd_proper) + "</td></tr>\n" + "\n<tr><td colspan=\"8\">" + GetFecha(arbolRoot.Avd_fecha_creacion) + "</td></tr>\n<tr>"
+
+		var insideRoot = ""
+		var enlacesRoot = ""
+		var childRoot = ""
+
+		for i := 0; i < len(arbolRoot.Avd_ap_array_subdirectorios); i++ {
+			var data = arbolRoot.Avd_ap_array_subdirectorios[i]
+			if data == -1 {
+				insideRoot = insideRoot + "\n<td port='port'>-1</td>"
+			} else {
+				insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(data)) + "'>" + strconv.Itoa(int(data)) + "</td>"
+				enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(data)) + "   -> child" + strconv.Itoa(int(data)) + ";"
+				childRoot = childRoot + GetAlDirectory(data, "child"+strconv.Itoa(int(data)), file)
+			}
+		}
+
+		/// A DIRECOTRY
+		var detalle = ""
+		fmt.Println("---------")
+		var detallebit = arbolRoot.Avd_ap_detalle_directorio
+		if detallebit != -1 {
+			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td>"
+			detalle = detalle + GetAlDetails(detallebit, "child"+strconv.Itoa(int(detallebit)), file)
+			enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(detallebit)) + "   -> child" + strconv.Itoa(int(detallebit)) + ";"
+		}
+
+		// APUNTADOR INDIRECTO
+		if arbolRoot.Avd_ap_arbol_virtual_directorio != -1 {
+			var dt = arbolRoot.Avd_ap_arbol_virtual_directorio
+			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>" + strconv.Itoa(int(dt)) + "</td>"
+			enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(dt)) + "   -> child" + strconv.Itoa(int(dt)) + ";"
+			childRoot = childRoot + GetAlDirectory(dt, "child"+strconv.Itoa(int(dt)), file)
+		}
+
+		root = root + insideRoot
+		root = root + "\n</tr></table>>];"
+		body = body + root + childRoot + enlacesRoot + detalle
+
+		body = body + "\n}"
+
+		dir, name := filepath.Split(path)
+
+		GeneratePNG(name, body, dir)*/
+	} else {
+		fmt.Println("La particion con ID: " + id + " no esta montada")
+	}
+}
+
+func GetFileNamesInDetails(bitInicio int64, contador int, file *os.File) {
+	fmt.Println("========================")
+	fmt.Println("> Listado de Archivos")
+	fmt.Println("========================")
+
+	for i := 0; i < contador; i++ {
+
+		var detalle = CONTROLLER.GETDetails((bitInicio + int64(i)*int64(unsafe.Sizeof(STRUCTURES.DIRECTORYDETAIL{}))), file)
+		fmt.Println("." + GetAllName(detalle.DD_file_nombre))
+	}
+}
+
 //se guarda la direccion del proyecto
 var rootDir = FUNCTION.RootDir()
 
@@ -580,9 +685,10 @@ func CreateDiskReport(mbr STRUCTURES.MBR, diskName string) {
 
 								}
 							}
+
 						}
 						body = body + "<td WIDTH=\"" + strconv.Itoa(int(espacioExtendidoLIbre/100)) + "\" > Ext Libre" + strconv.Itoa(int(espacioExtendidoLIbre)) + "</td >"
-
+						CreateEBRReport(extended)
 					}
 
 					body = body + "</tr></table></td>"
@@ -603,6 +709,47 @@ func CreateDiskReport(mbr STRUCTURES.MBR, diskName string) {
 	body = body + "</tr></table>>];}"
 
 	GeneratePNG("disk.jpg", body, rootDir+"/reports/dots/")
+}
+
+func CreateEBRReport(extended STRUCTURES.EXTENDED) {
+
+	var espacioExtendidoLIbre int64 = extended.Part_size
+	var body = "digraph H {" +
+		"rankdir=\"LR\" " +
+		"parent [ shape=plaintext " +
+		"label=<<table border='1' cellborder='1'> "
+	if len(extended.Part_ebr) == 1 && len(extended.Part_partition) == 0 {
+
+		body = body + "<tr><td colspan=\"2\">EBR PARTITIONS</td></tr><tr>"
+		body = body + "<td WIDTH=\"" + strconv.Itoa(int(extended.Part_ebr[0].Part_size)) + "\" > EBR:" + strconv.Itoa(int(extended.Part_ebr[0].Part_size)) + "</td >"
+		espacioExtendidoLIbre = espacioExtendidoLIbre - extended.Part_ebr[0].Part_size
+
+	} else {
+
+		var leng = strconv.Itoa(len(extended.Part_ebr)*2 + 1)
+		body = body + "<tr><td colspan=\"" + leng + "\">EBR PARTITIONS</td></tr><tr>"
+
+		for i := 0; i < len(extended.Part_ebr); i++ {
+
+			if extended.Part_partition[i].Part_isEmpty == 1 {
+				var ebrAuxiliar = extended.Part_ebr[i]
+				body = body + "<td WIDTH=\"" + strconv.Itoa(int(ebrAuxiliar.Part_size)) + "\" > " + GetString1(ebrAuxiliar.Part_name) + ":" + strconv.Itoa(int(ebrAuxiliar.Part_size)) + "</td >"
+				var logicaAuxiliar = extended.Part_partition[i]
+
+				var lenlogic = logicaAuxiliar.Part_size / 100
+				body = body + "<td WIDTH=\"" + strconv.Itoa(int(lenlogic)) + "\"> " + GetString1(logicaAuxiliar.Part_name) + " :" + strconv.Itoa(int(logicaAuxiliar.Part_size)) + "</td >"
+
+				espacioExtendidoLIbre = espacioExtendidoLIbre - ebrAuxiliar.Part_size - logicaAuxiliar.Part_size
+
+			}
+		}
+
+	}
+	body = body + "<td WIDTH=\"" + strconv.Itoa(int(espacioExtendidoLIbre/100)) + "\" > Ext Libre: " + strconv.Itoa(int(espacioExtendidoLIbre)) + "</td >"
+
+	body = body + "</tr></table>>];}"
+
+	GeneratePNG("ebr.jpg", body, rootDir+"/reports/dots/")
 }
 
 func GeneratePNG(nombre string, body string, path string) {

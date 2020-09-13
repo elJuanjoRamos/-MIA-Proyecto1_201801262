@@ -91,6 +91,10 @@ func GetCommand(commandEntry string) {
 		fmt.Println("--" + commandEntry)
 		RepCommand(arCommand)
 		break
+	case "cat":
+		fmt.Println("--" + commandEntry)
+		CatCommand(arCommand)
+		break
 
 	default:
 		if !strings.Contains(command, "#") {
@@ -781,5 +785,31 @@ func RepCommand(arCommand []string) {
 		EXECUTE.MakeAReport(path, id, strings.ToLower(nombre), ruta)
 	} else {
 		fmt.Println("Error al ejecutar el comando MKUSR")
+	}
+}
+
+//=== CAT
+
+func CatCommand(arCommand []string) {
+	var files []string
+	var id = ""
+	if len(arCommand) > 1 {
+		for i := 1; i < len(arCommand); i++ {
+
+			var commandToExecute = strings.Split(arCommand[i], "->")
+			var aux string = strings.ToLower(commandToExecute[0])
+			if strings.Contains(aux, "-file") {
+				files = append(files, FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1])))
+			} else if strings.Contains(aux, "-id") {
+				id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
+			}
+
+		}
+	}
+
+	if len(files) > 0 && id != "" {
+		EXECUTE.MostarFiles(files, id)
+	} else {
+		fmt.Println("Error al intentar ejecutar el comando Cat")
 	}
 }
