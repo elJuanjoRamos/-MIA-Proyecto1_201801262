@@ -22,20 +22,9 @@ login -usr->root -pwd->201801262 -id->vda1
 pause
 Mkdir -P -id->vda1 -path->"/home/user/usac"
 pause
-Mkdir -P -id->vda1 -path->"/home/prueba"
+mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/a.txt" -p -cont->"bloque de 25 caracteeres bloque de 50 caracteeres bloque de 100 caracteres bloque de 125 caracteres bloque de 150 caracteres bloque de 175 caracteres bloque de 200 caracteres bloque de 225 caracteres bloque de 250 caracteres" 
 pause
-Mkdir -P -id->vda1 -path->"/home/fasd"
-pause
-Mkdir -P -id->vda1 -path->"/home/res"
-pause
-Mkdir -P -id->vda1 -path->"/home/fis"
-pause
-Mkdir -P -id->vda1 -path->"/home/ssdfds"
-pause
-Mkdir -P -id->vda1 -path->"/home/apuntador"
-pause
-Mkdir -id->vda1 -path->"/home/apuntador/adios"
-pause
+
 
 rep -id->vda1 -path->"/home/user/reports/reporte 3.jpg" -nombre->sb
 rep -id->vda1 -path->"/home/user/reports/bitmapArbol.txt" -nombre->bm_arbdir

@@ -26,7 +26,7 @@ func MakeAnDirectoryInDisk(sb STRUCTURES.SUPERBOOT, path string, p string, file 
 			stringTemporal = stringTemporal + "/" + pathlist[i]
 		}
 
-		SearchDir(stringTemporal, pathlist[len(pathlist)-1], username, sb.SB_ap_tree_dir, sb, file)
+		SearchDir(stringTemporal, pathlist[len(pathlist)-1], username, "/", sb.SB_ap_tree_dir, sb, file)
 	}
 
 }
@@ -139,14 +139,14 @@ func SearchAndCreateDir(inicioArbol int64, sb STRUCTURES.SUPERBOOT, path string,
 
 }
 
-func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPERBOOT, file *os.File) {
+func SearchDir(path, dir, username, pathpadre string, inicioArbol int64, sb STRUCTURES.SUPERBOOT, file *os.File) {
 	//PATH -> LA PATH QUE VOY A BUSCAR
 	//DIR -> LA CARPETA QUE VOY A CREAR
 
 	//home / hola
 	//OBTENGO EL ARBOL
 	var arbol = GetArbolVirual(inicioArbol, file)
-
+	pathpadre = GetStringByBytes(arbol.Avd_nombre_directorio)
 	if len(path) != 0 {
 
 		//PARTO EL PATH QUE VIENE
@@ -177,7 +177,7 @@ func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPE
 				}
 				path = stringTemporal
 
-				SearchDir(path, dir, username, bit, sb, file)
+				SearchDir(path, dir, username, pathpadre, bit, sb, file)
 
 				//SI LA BANDERA ES FALSA, SIGNIFICA QUE NO EXISTE EL DIRECTORIO
 
@@ -185,7 +185,7 @@ func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPE
 
 				if arbol.Avd_ap_arbol_virtual_directorio != -1 {
 
-					SearchDir(path, dir, username, arbol.Avd_ap_arbol_virtual_directorio, sb, file)
+					SearchDir(path, dir, username, pathpadre, arbol.Avd_ap_arbol_virtual_directorio, sb, file)
 
 				} else {
 					fmt.Println("==================================")
@@ -206,10 +206,20 @@ func SearchDir(path, dir, username string, inicioArbol int64, sb STRUCTURES.SUPE
 		}
 	} else { //SIGNIFICA QUE YA LLEGO AL FINAL DE LA PATH Y HAY QYE CREAR EL DIRECTORIO
 		//A INSERTAR EL NUEVO ARBOL CREADO
+		var bandera = false
 		for i := 0; i < len(arbol.Avd_ap_array_subdirectorios); i++ {
 			if arbol.Avd_ap_array_subdirectorios[i] == -1 {
 				arbol.Avd_ap_array_subdirectorios[i] = CreateArbolVirtual(dir, sb, file, username)
+				bandera = true
 				break
+			}
+		}
+
+		if !bandera {
+			if arbol.Avd_ap_arbol_virtual_directorio == -1 {
+
+				arbol.Avd_ap_arbol_virtual_directorio = CreateArbolVirtual(pathpadre, sb, file, username)
+				SearchDir(path, dir, username, pathpadre, arbol.Avd_ap_arbol_virtual_directorio, sb, file)
 			}
 		}
 	}

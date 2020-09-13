@@ -69,13 +69,11 @@ func MakeADirFirsTime(path string, id string) {
 			//NOS SITUAMOS AL INICIO DEL DETALLE DIRECTORIO
 			file.Seek(sb.SB_ap_detail_dir, 0)
 
-			fmt.Println()
-
 			//CREAMOS EL PRIMER DETALLE Y LLENAMOS EL PRIMER FILE
 			var dirInit = STRUCTURES.DIRECTORYDETAIL{
 				DD_file_ap_inodo:         sb.SB_ap_table_inode, //Como es la primera vez que lo creamos, el apuntador inodo de ese detalle, el el inicio del inodo
 				DD_file_lleno:            true,
-				DD_ap_detalle_directorio: 0,
+				DD_ap_detalle_directorio: -1,
 				///NUEVO
 				DD_num: 1,
 			}

@@ -233,7 +233,6 @@ func MakeAGenaralDirecoryReport(path, id, ruta string) {
 
 		// APUNTADOR INDIRECTO
 		if arbolRoot.Avd_ap_arbol_virtual_directorio != -1 {
-			fmt.Println("entro")
 			var dt = arbolRoot.Avd_ap_arbol_virtual_directorio
 			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>" + strconv.Itoa(int(dt)) + "</td>"
 			enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(dt)) + "   -> child" + strconv.Itoa(int(dt)) + ";"
@@ -289,7 +288,6 @@ func GetAlDirectory(bitInicio int64, name string, file *os.File) string {
 
 	// APUNTADOR INDIRECTO
 	if arbolRoot.Avd_ap_arbol_virtual_directorio != -1 {
-		fmt.Println("entro")
 		var dt = arbolRoot.Avd_ap_arbol_virtual_directorio
 		insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>I: " + strconv.Itoa(int(dt)) + "</td>"
 		enlacesRoot = enlacesRoot + "\n" + name + ":port" + strconv.Itoa(int(dt)) + "   -> child" + strconv.Itoa(int(dt)) + ";"
@@ -310,49 +308,66 @@ func GetAlDetails(bitInicio int64, name string, file *os.File) string {
 	var interior = ""
 	var inodos = ""
 	var apuntadores = ""
+	var childs = ""
 	if detalle.DD_file_lleno == true {
-		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "'>" +
+		interior = interior + "\n<tr>\n<td colspan=\"4\">" + GetAllName(detalle.DD_file_nombre) + "</td>\n<td colspan=\"4\" port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "'>" +
 			strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "</td>\n</tr>\n"
 
-		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + ";"
-		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo)), file)
+		if detalle.DD_file_ap_inodo != -1 {
+			inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo)), file)
+			apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo)) + ";"
+		}
+
 	}
 	if detalle.DD_file_lleno2 == true {
-		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre2) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "'>" +
+		interior = interior + "\n<tr>\n<td colspan=\"4\">" + GetAllName(detalle.DD_file_nombre2) + "</td>\n<td colspan=\"4\" port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "'>" +
 			strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "</td>\n</tr>\n"
 
-		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + ";"
-		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo2, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo2)), file)
-
+		if detalle.DD_file_ap_inodo2 != -1 {
+			inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo2, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo2)), file)
+			apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo2)) + ";"
+		}
 	}
 	if detalle.DD_file_lleno3 == true {
-		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre3) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "'>" +
+		interior = interior + "\n<tr>\n<td colspan=\"4\">" + GetAllName(detalle.DD_file_nombre3) + "</td>\n<td colspan=\"4\" port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "'>" +
 			strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "</td>\n</tr>\n"
 
-		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + ";"
-		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo3, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo3)), file)
+		if detalle.DD_file_ap_inodo3 != -1 {
+			inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo3, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo3)), file)
+			apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo3)) + ";"
+		}
 
 	}
 	if detalle.DD_file_lleno4 == true {
-		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre4) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "'>" +
+		interior = interior + "\n<tr>\n<td colspan=\"4\">" + GetAllName(detalle.DD_file_nombre4) + "</td>\n<td colspan=\"4\" port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "'>" +
 			strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "</td>\n</tr>\n"
 
-		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + ";"
-		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo4, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo4)), file)
-
+		if detalle.DD_file_ap_inodo4 != -1 {
+			inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo4, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo4)), file)
+			apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo4)) + ";"
+		}
 	}
 	if detalle.DD_file_lleno5 == true {
-		interior = interior + "\n<tr>\n<td>" + GetAllName(detalle.DD_file_nombre5) + "</td>\n<td port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "'>" +
+		interior = interior + "\n<tr>\n<td colspan=\"4\">" + GetAllName(detalle.DD_file_nombre5) + "</td>\n<td colspan=\"4\" port='port" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "'>" +
 			strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "</td>\n</tr>\n"
 
-		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + ";"
-		inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo5, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo5)), file)
+		if detalle.DD_file_ap_inodo5 != -1 {
+			inodos = inodos + GetAlInodes(detalle.DD_file_ap_inodo5, "child"+strconv.Itoa(int(detalle.DD_file_ap_inodo5)), file)
+			apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + "   -> child" + strconv.Itoa(int(detalle.DD_file_ap_inodo5)) + ";"
+		}
+	}
 
+	if detalle.DD_ap_detalle_directorio != -1 {
+		interior = interior + "\n<tr>\n<td colspan=\"4\">" + "Indirecto" + "</td>\n<td colspan=\"4\" port='port" + strconv.Itoa(int(detalle.DD_ap_detalle_directorio)) + "'>" +
+			strconv.Itoa(int(detalle.DD_ap_detalle_directorio)) + "</td>\n</tr>\n"
+
+		apuntadores = apuntadores + "\n" + name + ":port" + strconv.Itoa(int(detalle.DD_ap_detalle_directorio)) + "   -> child" + strconv.Itoa(int(detalle.DD_ap_detalle_directorio)) + ";"
+		childs = childs + GetAlDetails(detalle.DD_ap_detalle_directorio, "child"+strconv.Itoa(int(detalle.DD_ap_detalle_directorio)), file)
 	}
 
 	body = body + interior
 
-	body = body + "</table> >]" + inodos + apuntadores
+	body = body + "</table> >]" + inodos + apuntadores + childs
 	return body
 }
 
@@ -364,6 +379,7 @@ func GetAlInodes(bitInicio int64, name string, file *os.File) string {
 
 	var enlaces = ""
 	var bloques = ""
+	var childs = ""
 	body = body + "\n<tr><td colspan=\"2\"> Numero:" + strconv.Itoa(int(inodo.I_count_inodo)) + "</td></tr>"
 	body = body + "\n<tr><td colspan=\"2\"> Size File:" + strconv.Itoa(int(inodo.I_size_archivo)) + "</td></tr>"
 	body = body + "\n<tr><td colspan=\"2\"> B. Asig:" + strconv.Itoa(int(inodo.I_count_bloques_asignados)) + "</td></tr>"
@@ -376,8 +392,13 @@ func GetAlInodes(bitInicio int64, name string, file *os.File) string {
 
 		}
 	}
+	if inodo.I_ap_indirecto != -1 {
+		body = body + " <tr><td>Indirecto </td> <td port='port" + strconv.Itoa(int(inodo.I_ap_indirecto)) + "'> " + strconv.Itoa(int(inodo.I_ap_indirecto)) + " </td> " + "</tr>"
+		enlaces = enlaces + "\n" + name + ":port" + strconv.Itoa(int(inodo.I_ap_indirecto)) + "   -> child" + strconv.Itoa(int(inodo.I_ap_indirecto)) + ";"
+		childs = childs + GetAlInodes(inodo.I_ap_indirecto, "child"+strconv.Itoa(int(inodo.I_ap_indirecto)), file)
+	}
 
-	body = body + "</table>>];" + enlaces + bloques
+	body = body + "</table>>];" + enlaces + bloques + childs
 	return body
 }
 
