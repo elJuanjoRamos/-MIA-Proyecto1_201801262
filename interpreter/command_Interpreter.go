@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -231,6 +232,9 @@ func MKDiskCommand(arCommand []string) {
 
 		}
 	}
+
+	EXECUTE.AddAccion(1, "ARCHIVO", name, "creacion del archivo en la path: "+path)
+
 	//Verifica que no haya error
 	if !error {
 		//si unit = 0, significa que no vino en el comando, por default es 1 Mb
@@ -254,7 +258,10 @@ func RMDiskCommand(arCommand []string) {
 		if arCommand[i] != "" {
 			var commandToExecute []string = strings.Split(arCommand[i], "->")
 			var path string = FUNCTION.ReplaceAll(FUNCTION.ReplaceAll(FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))))
+			file := filepath.Base(path)
+			EXECUTE.AddAccion(2, "ARCHIVO", file, "eliminacion del archivo en la path: "+path)
 			EXECUTE.RemoveDisk(path)
+			break
 		}
 	}
 }
@@ -340,6 +347,7 @@ func FDiskCommand(arCommand []string) {
 				fmt.Println("Error al ejecutar el comando FDISK")
 			}
 		} else {
+			EXECUTE.AddAccion(3, "ARCHIVO", name, "formateo de del archivo en la path: "+path)
 			EXECUTE.FormatDisk(path, unit*size, name, types, fit)
 		}
 
@@ -371,6 +379,7 @@ func MOUNTCommand(arCommand []string) {
 
 	if path != "null" && name != "null" {
 		if path != "" && name != "" {
+			EXECUTE.AddAccion(4, "PARTICION", name, "Montar la particion con id :'"+name+"'  dada la path: "+path)
 			EXECUTE.Mount(path, name)
 		} else {
 			fmt.Println("Ha ocurrido un error al intentar ejecutar el comando Mount")
@@ -391,6 +400,7 @@ func UNMOUNTCommand(arCommand []string) {
 			var aux string = strings.ToLower(commandToExecute[0])
 			if strings.Contains(aux, "-id") {
 				ids = append(ids, FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1])))
+				EXECUTE.AddAccion(4, "PARTICION", commandToExecute[1], "Desmontar Particion "+commandToExecute[1])
 			}
 		}
 	}
@@ -456,6 +466,8 @@ func MKfsCommand(arCommand []string) {
 
 			//si las unidades son cero, significa que solo se quiere formatear la unidad
 		} else {
+			EXECUTE.AddAccion(5, "PARTICION", id, "Formateo de particion del tipo "+types)
+
 			EXECUTE.MKFSFormatPartition(id, types)
 			EXECUTE.MakeADirFirsTime("/", id)
 
@@ -502,7 +514,7 @@ func LoginCommand(arCommand []string) {
 	}
 	//Verifica que no haya error
 	if !error {
-
+		EXECUTE.AddAccion(6, "LOGIN", id+"/"+pwd, "Login de usuario en la paticion "+id)
 		EXECUTE.Login(usr, pwd, id)
 	} else {
 		fmt.Println("Error al ejecutar el comando login")
@@ -541,6 +553,7 @@ func MKGroupCommand(arCommand []string) {
 	}
 	//Verifica que no haya error
 	if !error {
+		EXECUTE.AddAccion(7, "GRPUP", name, "Crear grupo en la paticion "+id)
 		EXECUTE.CreateGroup(name, id)
 	} else {
 		fmt.Println("Error al ejecutar el comando MKGRP")
@@ -611,7 +624,7 @@ func MKUsrCommand(arCommand []string) {
 	}
 	//Verifica que no haya error
 	if !error {
-
+		EXECUTE.AddAccion(8, "USER", usr+"/"+pwd, "Crear usuario en la paticion "+id)
 		EXECUTE.MakeAUser(usr, pwd, id, grp)
 	} else {
 		fmt.Println("Error al ejecutar el comando MKUSR")
@@ -687,6 +700,7 @@ func MKDirCommand(arCommand []string) {
 	//Verifica que no haya error
 	if !error {
 
+		EXECUTE.AddAccion(9, "DIRECTORIO", id, "Crear directorio "+path)
 		EXECUTE.MakeADir(path, id, p)
 	} else {
 		fmt.Println("Error al ejecutar el comando MKUSR")
@@ -742,6 +756,33 @@ func MKFileCommand(arCommand []string) {
 	//Verifica que no haya error
 	if !error {
 
+		var abc = " abcdefghijklmnopqrstuvwzyz"
+		var strtemp = ""
+
+		if cont == "" {
+			cont = abc
+		}
+		if size == 0 && cont != "" {
+			size = int64(len(cont))
+		}
+		if size > int64(len(cont)) {
+			var iTmp = 0
+			for i := int64(len(cont)); i < size; i++ {
+
+				if iTmp == 26 {
+					iTmp = 0
+				}
+				cont = cont + string(abc[iTmp])
+				iTmp = iTmp + 1
+			}
+
+		} else if size < int64(len(cont)) {
+			for i := 0; i < int(size); i++ {
+				strtemp = strtemp + string(cont[i])
+			}
+			cont = strtemp
+		}
+		EXECUTE.AddAccion(10, "ARCHIVO", id, "Crear archivo "+path+" con size "+strconv.Itoa(int(size))+" y contenido:"+cont)
 		EXECUTE.MakeAFileInLogicalDisk(path, id, p, size, cont)
 	} else {
 		fmt.Println("Error al ejecutar el comando MKUSR")
@@ -781,6 +822,7 @@ func RepCommand(arCommand []string) {
 	}
 	//Verifica que no haya error
 	if !error {
+		EXECUTE.AddAccion(11, "ARCHIVO", id, "Generar reporte: "+nombre)
 
 		EXECUTE.MakeAReport(path, id, strings.ToLower(nombre), ruta)
 	} else {
@@ -793,6 +835,7 @@ func RepCommand(arCommand []string) {
 func CatCommand(arCommand []string) {
 	var files []string
 	var id = ""
+	var temporal = ""
 	if len(arCommand) > 1 {
 		for i := 1; i < len(arCommand); i++ {
 
@@ -800,6 +843,7 @@ func CatCommand(arCommand []string) {
 			var aux string = strings.ToLower(commandToExecute[0])
 			if strings.Contains(aux, "-file") {
 				files = append(files, FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1])))
+				temporal = temporal + "-" + FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			} else if strings.Contains(aux, "-id") {
 				id = FUNCTION.RemoveComilla(FUNCTION.ReplaceAll(commandToExecute[1]))
 			}
@@ -808,6 +852,7 @@ func CatCommand(arCommand []string) {
 	}
 
 	if len(files) > 0 && id != "" {
+		EXECUTE.AddAccion(12, "ARCHIVO", id, "Mostrar contenido en el o los archivos: "+temporal)
 		EXECUTE.MostarFiles(files, id)
 	} else {
 		fmt.Println("Error al intentar ejecutar el comando Cat")

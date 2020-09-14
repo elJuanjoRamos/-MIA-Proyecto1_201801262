@@ -22,14 +22,28 @@ login -usr->root -pwd->201801262 -id->vda1
 pause
 Mkdir -P -id->vda1 -path->"/home/user/usac"
 pause
-mkFile -SIZE->42 -id->vda1 -PatH->"/home/user/docs/a.txt" -p  -cont->"hola mundo desde archivo a, esto es prueba"
+mkFile -SIZE->4 -id->vda1 -PatH->"/home/user/docs/a.txt" -p  -cont->"hola mundo desde archivo a, esto es prueba"
 pause
-mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/b.txt" -p  -cont->"hola mundo desde archivo b"
+mkFile -SIZE->50 -id->vda1 -PatH->"/home/user/docs/b.txt" -p  -cont->"hola mundo desde archivo b"
 pause
 mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/c.txt" -p  -cont->"hola mundo desde archivo c"
 pause
 mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/d.txt" -p  -cont->"hola mundo desde archivo d"
 pause
+mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/docs/e.txt" -p  -cont->"hola mundo desde archivo d"
+pause
+mkFile -SIZE->15 -id->vda1 -PatH->"/home/user/f.txt" -p  -cont->"hola mundo desde archivo d"
+pause
+mkFile -SIZE->15 -id->vda1 -PatH->"/home/g.txt" -p  -cont->"hola mundo desde archivo d"
+pause
+mkFile -SIZE->15 -id->vda1 -PatH->"/h.txt" -p  -cont->"hola mundo desde archivo d"
+pause
+mkgrp -id->vda1 -name->"usuarios"
+pause
+Mkusr -id->vda1 -usr->"user1" -grp->usuarios -pwd->usuario
+
+
+
 #Cat -file1->"/home/user/docs/a.txt" -Id->vda1
 Cat -file1->"/home/user/docs/a.txt" -Id->vda1 -file1->"/home/user/docs/b.txt"  -file1->"/home/user/docs/c.txt"
 
@@ -38,7 +52,9 @@ Cat -file1->"/home/user/docs/a.txt" -Id->vda1 -file1->"/home/user/docs/b.txt"  -
 #rep -id->vda1 -path->"/home/user/reports/bm_detdir.txt" -nombre->bm_detdir
 #rep -id->vda1 -path->"/home/user/reports/bm_inode.txt" -nombre->bm_inode
 #rep -id->vda1 -path->"/home/user/reports/bm_block.txt" -nombre->bm_block
-#rep -id->vda1 -path->"/home/user/reports/arbol.jpg" -nombre->directorio
+rep -id->vda1 -path->"/home/user/reports/arbol.jpg" -nombre->directorio
+rep -id->vda1 -path->"/home/user/reports/log.txt" -nombre->bitacora
+
 #rep -id->vda1 -path->"/home/user/reports/tree_file.jpg" -nombre->tree_file
 
 

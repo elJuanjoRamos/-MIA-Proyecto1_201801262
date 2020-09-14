@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"unsafe"
 
 	CONTROLLER "../controllers"
@@ -39,9 +40,8 @@ func MakeAReport(path, id, nombre, ruta string) {
 	case "tree_file":
 		TreeFileReport(path, id, ruta)
 		break
-	case "fffff":
-		break
-	case "a":
+	case "bitacora":
+		MakeALogReport(path, id, ruta)
 		break
 	}
 }
@@ -189,6 +189,31 @@ func MakeABitMapReport(path, id, ruta string, types int) { ////REPORTES DE BITMA
 	}
 }
 
+//======================= REPORTE LOG
+func MakeALogReport(path, id, ruta string) {
+	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
+
+		var str = ""
+		var bitacora = GetBitacora()
+
+		for i := 0; i < len(bitacora); i++ {
+			var temp = bitacora[i]
+
+			if strings.Contains(temp.nombre, id) || strings.Contains(temp.contenido, id) {
+				str = str +
+					"Tipo Operacion:" + strconv.Itoa(temp.operacion) + "\nTipo:" + temp.tipo + "\nNombre:" + temp.nombre + "\nContenido:" + temp.contenido + "\nFecha:" + temp.fecha + "\n-----\n"
+			}
+		}
+
+		dir, name := filepath.Split(path)
+
+		FUNCTION.CreateADirectory(dir)
+		FUNCTION.CreateAFile(dir+name, str)
+	} else {
+		fmt.Println("La particion con ID: " + id + " no esta montada")
+	}
+}
+
 //===================REPORTE GENRAL
 func MakeAGenaralDirecoryReport(path, id, ruta string) {
 	if SearchPartitionById(id) { //VOY A BUSCAR LA PARTICION MONTADA, ESTE METODO ESTA EN MOUNT_UMOUNT.GO
@@ -205,11 +230,11 @@ func MakeAGenaralDirecoryReport(path, id, ruta string) {
 
 		//OBTENGO EL ARBOL DE DIRECTORIOS
 		var arbolRoot = CONTROLLER.GetArbolVirual(sb.SB_ap_tree_dir, file)
-		var body = "digraph H {"
+		var body = "digraph H { rankdir=\"LR" + "\"  "
 
 		//ROOT
-		var root = "parent [ shape=plaintext \n label=<\n<table border='1' cellborder='1'> \n<tr><td colspan=\"8\">" + GetAllName(arbolRoot.Avd_nombre_directorio) + "</td></tr> " +
-			"\n<tr><td colspan=\"8\">Proper: " + GetAllName(arbolRoot.Avd_proper) + "</td></tr>\n" + "\n<tr><td colspan=\"8\">" + GetFecha(arbolRoot.Avd_fecha_creacion) + "</td></tr>\n<tr>"
+		var root = "parent [ shape=plaintext label=<\n<table border='1' cellborder='1'> \n<tr>\n\t<td bgcolor=\"chartreuse\" colspan=\"2\">" + GetAllName(arbolRoot.Avd_nombre_directorio) + "</td>\n</tr>\n" +
+			"<tr>\n\t<td colspan=\"2\"> Proper: " + GetAllName(arbolRoot.Avd_proper) + "</td>\n</tr>\n" + "<tr>\n\t<td colspan=\"2\"> Proper: " + GetFecha(arbolRoot.Avd_fecha_creacion) + "</td>\n</tr>\n"
 
 		var insideRoot = ""
 		var enlacesRoot = ""
@@ -218,9 +243,9 @@ func MakeAGenaralDirecoryReport(path, id, ruta string) {
 		for i := 0; i < len(arbolRoot.Avd_ap_array_subdirectorios); i++ {
 			var data = arbolRoot.Avd_ap_array_subdirectorios[i]
 			if data == -1 {
-				insideRoot = insideRoot + "\n<td port='port'>-1</td>"
+				insideRoot = insideRoot + "\n<tr>\n\t<td>AVD apun</td>\n\t<td port='port'>-1</td>\n</tr>\n"
 			} else {
-				insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(data)) + "'>" + strconv.Itoa(int(data)) + "</td>"
+				insideRoot = insideRoot + "\n<tr>\n\t<td>AVD apun</td>\n\t<td port='port" + strconv.Itoa(int(data)) + "'>" + strconv.Itoa(int(data)) + "</td>\n</tr>"
 				enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(data)) + "   -> child" + strconv.Itoa(int(data)) + ";"
 				childRoot = childRoot + GetAlDirectory(data, "child"+strconv.Itoa(int(data)), file)
 			}
@@ -231,7 +256,7 @@ func MakeAGenaralDirecoryReport(path, id, ruta string) {
 		fmt.Println("---------")
 		var detallebit = arbolRoot.Avd_ap_detalle_directorio
 		if detallebit != -1 {
-			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td>"
+			insideRoot = insideRoot + "\n<tr><td>DD apun</td><td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td></tr>"
 			detalle = detalle + GetAlDetails(detallebit, "child"+strconv.Itoa(int(detallebit)), file)
 			enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(detallebit)) + "   -> child" + strconv.Itoa(int(detallebit)) + ";"
 		}
@@ -239,13 +264,13 @@ func MakeAGenaralDirecoryReport(path, id, ruta string) {
 		// APUNTADOR INDIRECTO
 		if arbolRoot.Avd_ap_arbol_virtual_directorio != -1 {
 			var dt = arbolRoot.Avd_ap_arbol_virtual_directorio
-			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>" + strconv.Itoa(int(dt)) + "</td>"
+			insideRoot = insideRoot + "\n<tr><td>AVD INDIR</td><td port='port" + strconv.Itoa(int(dt)) + "'>" + strconv.Itoa(int(dt)) + "</td></tr>"
 			enlacesRoot = enlacesRoot + "\nparent:port" + strconv.Itoa(int(dt)) + "   -> child" + strconv.Itoa(int(dt)) + ";"
 			childRoot = childRoot + GetAlDirectory(dt, "child"+strconv.Itoa(int(dt)), file)
 		}
 
 		root = root + insideRoot
-		root = root + "\n</tr></table>>];"
+		root = root + "\n</table>>];"
 		body = body + root + childRoot + enlacesRoot + detalle
 
 		body = body + "\n}"
@@ -262,9 +287,8 @@ func GetAlDirectory(bitInicio int64, name string, file *os.File) string {
 
 	var arbolRoot = CONTROLLER.GetArbolVirual(bitInicio, file)
 
-	var root = "\n" + name + " [ shape=plaintext \nlabel=< \n<table border='1' cellborder='1'> \n<tr><td colspan=\"8\">/" + GetAllName(arbolRoot.Avd_nombre_directorio) + "</td></tr> " +
-		"\n<tr><td colspan=\"4\">Prop:" + GetAllName(arbolRoot.Avd_proper) + "</td><td colspan=\"4\">Num:" + strconv.Itoa(int(arbolRoot.Avd_num)) + "</td></tr>\n" +
-		"\n<tr><td colspan=\"8\">" + GetFecha(arbolRoot.Avd_fecha_creacion) + "</td></tr>\n<tr>"
+	var root = "\n" + name + " [ shape=plaintext label=<\n<table border='1' cellborder='1'> \n<tr>\n\t<td bgcolor=\"chartreuse\"  colspan=\"2\">" + GetAllName(arbolRoot.Avd_nombre_directorio) + "</td>\n</tr>\n" +
+		"<tr>\n\t<td colspan=\"2\"> Proper: " + GetAllName(arbolRoot.Avd_proper) + "</td>\n</tr>" + "\n<tr>\n\t<td colspan=\"2\"> Proper: " + GetFecha(arbolRoot.Avd_fecha_creacion) + "</td>\n</tr>\n"
 
 	var insideRoot = ""
 	var enlacesRoot = ""
@@ -274,9 +298,9 @@ func GetAlDirectory(bitInicio int64, name string, file *os.File) string {
 	for i := 0; i < len(arbolRoot.Avd_ap_array_subdirectorios); i++ {
 		var data = arbolRoot.Avd_ap_array_subdirectorios[i]
 		if data == -1 {
-			insideRoot = insideRoot + "\n<td port='port'>-1</td>"
+			insideRoot = insideRoot + "\n<tr><td>AVD apun</td><td port='port'>-1</td></tr>"
 		} else {
-			insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(data)) + "'>" + strconv.Itoa(int(data)) + "</td>"
+			insideRoot = insideRoot + "\n<tr><td>AVD apun</td><td port='port" + strconv.Itoa(int(data)) + "'>" + strconv.Itoa(int(data)) + "</td></tr>"
 			enlacesRoot = enlacesRoot + "\n" + name + ":port" + strconv.Itoa(int(data)) + "   -> child" + strconv.Itoa(int(data)) + ";"
 			childRoot = childRoot + GetAlDirectory(data, "child"+strconv.Itoa(int(data)), file)
 		}
@@ -286,7 +310,9 @@ func GetAlDirectory(bitInicio int64, name string, file *os.File) string {
 	var detalle = ""
 	var detallebit = arbolRoot.Avd_ap_detalle_directorio
 	if detallebit != -1 {
-		insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td>"
+		//insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td>"
+		insideRoot = insideRoot + "\n<tr><td>DD apun</td><td port='port" + strconv.Itoa(int(detallebit)) + "'>" + strconv.Itoa(int(detallebit)) + "</td></tr>"
+
 		detalle = detalle + GetAlDetails(detallebit, "child"+strconv.Itoa(int(detallebit)), file)
 		enlacesRoot = enlacesRoot + "\n" + name + ":port" + strconv.Itoa(int(detallebit)) + "   -> child" + strconv.Itoa(int(detallebit)) + ";"
 	}
@@ -294,13 +320,15 @@ func GetAlDirectory(bitInicio int64, name string, file *os.File) string {
 	// APUNTADOR INDIRECTO
 	if arbolRoot.Avd_ap_arbol_virtual_directorio != -1 {
 		var dt = arbolRoot.Avd_ap_arbol_virtual_directorio
-		insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>I: " + strconv.Itoa(int(dt)) + "</td>"
+		//insideRoot = insideRoot + "\n<td port='port" + strconv.Itoa(int(dt)) + "'>I: " + strconv.Itoa(int(dt)) + "</td>"
+		insideRoot = insideRoot + "\n<tr><td>AVD INDIR</td><td port='port" + strconv.Itoa(int(dt)) + "'>I:" + strconv.Itoa(int(dt)) + "</td></tr>"
+
 		enlacesRoot = enlacesRoot + "\n" + name + ":port" + strconv.Itoa(int(dt)) + "   -> child" + strconv.Itoa(int(dt)) + ";"
 		childRoot = childRoot + GetAlDirectory(dt, "child"+strconv.Itoa(int(dt)), file)
 	}
 
 	root = root + insideRoot
-	root = root + "\n</tr>\n</table>>];\n" + childRoot + enlacesRoot + detalle
+	root = root + "\n</table>>];\n" + childRoot + enlacesRoot + detalle
 
 	return root
 }
@@ -308,7 +336,7 @@ func GetAlDirectory(bitInicio int64, name string, file *os.File) string {
 func GetAlDetails(bitInicio int64, name string, file *os.File) string {
 	var detalle = CONTROLLER.GETDetails(bitInicio, file) // ESTA FUNCION ESTA EN DIRECTORY DETAIL CONTROLLER
 	var body = "\n" + name + " [ shape=plaintext label=<  <table border='1' cellborder='1'> " +
-		" <tr><td colspan=\"4\">Detail</td><td colspan=\"4\">" + strconv.Itoa(int(detalle.DD_num)) + "</td></tr>"
+		" <tr><td bgcolor=\"cadetblue1\" colspan=\"4\">Detail</td><td bgcolor=\"cadetblue1\" colspan=\"4\">" + strconv.Itoa(int(detalle.DD_num)) + "</td></tr>"
 
 	var interior = ""
 	var inodos = ""
@@ -380,7 +408,7 @@ func GetAlInodes(bitInicio int64, name string, file *os.File) string {
 
 	var inodo = CONTROLLER.GETInode(bitInicio, file)
 
-	var body = "\n" + name + " [shape=plaintext label=<<table border='1' cellborder='1'>\n <tr><td colspan=\"2\">Inodo</td></tr>"
+	var body = "\n" + name + " [shape=plaintext label=<<table border='1' cellborder='1'>\n <tr><td bgcolor=\"chocolate1\" colspan=\"2\">Inodo</td></tr>"
 
 	var enlaces = ""
 	var bloques = ""
@@ -413,7 +441,7 @@ func GetAlBloques(bitInicio int64, name string, file *os.File) string {
 	var body = "\n" + name + " [ shape=plaintext label=<<table border='1' cellborder='1'>"
 
 	if encontrado {
-		body = body + "<tr><td colspan=\"2\">Block</td></tr>"
+		body = body + "<tr><td bgcolor=\"deepskyblue1\" colspan=\"2\">Block</td></tr>"
 
 		body = body + "<tr><td colspan=\"2\">" + GetContentBlock(bloque.DB_data) + "</td></tr>"
 
@@ -582,7 +610,7 @@ func CreateDiskReport(mbr STRUCTURES.MBR, diskName string) {
 
 	var tableSize = mbr.Mbr_disk / 100
 
-	var body string = "digraph {" +
+	var body string = "digraph {  " +
 		"tbl [ " +
 		"shape=plaintext " +
 		"label=<" +

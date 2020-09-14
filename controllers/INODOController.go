@@ -11,6 +11,7 @@ import (
 )
 
 func INODOCONTROLLER_CreateINODO(superboot STRUCTURES.SUPERBOOT, file *os.File, lenArchivo int64, idProper int64) int64 {
+
 	//NOS SITUAMOS AL INICIO DEL BITMAP DE INODOS
 	file.Seek(superboot.SB_ap_bitmap_table_inode, 0)
 
@@ -39,7 +40,7 @@ func INODOCONTROLLER_CreateINODO(superboot STRUCTURES.SUPERBOOT, file *os.File, 
 
 	var inodo = STRUCTURES.TABLEINODE{
 		I_count_inodo:             contador + 1,
-		I_size_archivo:            lenArchivo,
+		I_size_archivo:            0,
 		I_count_bloques_asignados: 0,
 		I_ap_indirecto:            -1,
 		I_id_proper:               idProper,

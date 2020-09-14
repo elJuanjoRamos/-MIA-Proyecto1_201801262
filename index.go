@@ -4,6 +4,11 @@ import (
 	//EXECUTE "./commandExecute"
 	//EXECCOMAND "./commandExecute"
 
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+
 	INTERPRETE "./interpreter"
 )
 
@@ -17,23 +22,21 @@ func main() {
 //FUNCION INTERPRETE
 func interpret() {
 
-	comando1 := "exec -path->\"/home/eljuanjoramos/Documentos/ARCHIVOS/-MIA-Proyecto1_201801262/archivo\""
-	INTERPRETE.GetCommand(comando1)
-	/*finalizar := 0
-	inicio := "╔══════════════════════════════════════════════════╗\n"
+	finalizar := 0
+	inicio := "===================================================\n"
 	inicio += "  UNIVERSIDAD DE SAN CARLOS DE GUATEMALA\n"
 	inicio += "  MANEJO E IMPLEMENTACIÓN DE ARCHIVOS A-\n"
 	inicio += "  JUAN JOSE RAMOS CAMPOS\n"
 	inicio += "  201801262\n"
-	inicio += "╠══════════════════════════════════════════════════╣\n"
+	inicio += "===================================================\n"
 	inicio += "  Escriba X para finalizar.\n"
-	inicio += "╚══════════════════════════════════════════════════╝"
+	inicio += "==================================================="
 	fmt.Println(inicio)
 	var comando string = ""
 
 	for finalizar != 1 {
 		lecturaBuffer := bufio.NewReader(os.Stdin)
-		fmt.Print("->")
+		fmt.Print("->Comando: ")
 		strComando, _ := lecturaBuffer.ReadString('\n')
 
 		if strings.TrimRight(strComando, "\n") == "X" {
@@ -59,6 +62,6 @@ func interpret() {
 
 			}
 		}
-	}*/
+	}
 
 }
