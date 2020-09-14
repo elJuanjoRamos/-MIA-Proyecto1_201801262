@@ -36,7 +36,7 @@ func interpret() {
 
 	for finalizar != 1 {
 		lecturaBuffer := bufio.NewReader(os.Stdin)
-		fmt.Print("->Comando: ")
+		fmt.Print("->Comando:")
 		strComando, _ := lecturaBuffer.ReadString('\n')
 
 		if strings.TrimRight(strComando, "\n") == "X" {
